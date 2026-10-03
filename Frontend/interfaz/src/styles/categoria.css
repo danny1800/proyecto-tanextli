@@ -1,0 +1,86 @@
+.categoria-volver {
+  display: inline-block;
+  margin-bottom: 16px;
+  color: #2d6a4f;
+  font-size: 13.5px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.categoria-volver:hover { text-decoration: underline; }
+
+.categoria-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-radius: 12px;
+  padding: 20px 28px;
+  margin-bottom: 32px;
+}
+
+.categoria-header-icono {
+  font-size: 36px;
+}
+
+.categoria-header h2 { margin: 0 0 4px; }
+.categoria-header p { margin: 0; font-size: 14px; opacity: 0.85; }
+
+.lecciones-camino {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+.leccion-nodo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 14px 18px;
+  border-radius: 12px;
+  text-decoration: none;
+  background: #fff;
+  border: 2px solid #dfe9e2;
+  color: #1f2a24;
+  font-weight: 600;
+  transition: transform 0.15s ease;
+}
+
+.leccion-numero {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  background: #dfe9e2;
+  color: #1b4332;
+}
+
+.leccion-nodo.completada {
+  border-color: #2d6a4f;
+  background: #eafaf0;
+}
+.leccion-nodo.completada .leccion-numero {
+  background: #2d6a4f;
+  color: #fff;
+}
+
+.leccion-nodo.siguiente {
+  border-color: #1b4332;
+  box-shadow: 0 4px 14px rgba(27, 67, 50, 0.2);
+}
+.leccion-nodo.siguiente .leccion-numero {
+  background: #1b4332;
+  color: #fff;
+}
+.leccion-nodo.siguiente:hover { transform: translateY(-2px); }
+
+.leccion-nodo.bloqueada {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

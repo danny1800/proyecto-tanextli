@@ -1,0 +1,46 @@
+import Sidebar from '../components/Sidebar'
+import CategoriaCard from '../components/CategoriaCard'
+import { IconMenuHamburguesa, IconCampana } from '../components/Icons'
+import '../styles/menu.css'
+
+const categorias = [
+  { titulo: 'Familia', descripcion: 'Aprende los nombres de los miembros de la familia', icono: '👪', color: 'naranja', completadas: 0, total: 15, ruta: '/categoria/familia' },
+  { titulo: 'Colores', descripcion: 'Descubre los colores en náhuatl', icono: '🎨', color: 'morado', completadas: 0, total: 15, ruta: '/categoria/colores' },
+  { titulo: 'Números', descripcion: 'Aprende a contar en náhuatl', icono: '🔢', color: 'azul', completadas: 0, total: 15, ruta: '/categoria/numeros' },
+  { titulo: 'Frases', descripcion: 'Aprende unas frases en náhuatl', icono: '💬', color: 'verde', completadas: 0, total: 15, ruta: '/categoria/frases' },
+]
+
+function Menu() {
+  const nombreUsuario = 'Karla'
+
+  return (
+    <div className="menu-layout">
+      <Sidebar />
+
+      <main className="menu-contenido">
+        <div className="menu-topbar">
+          <button className="icono-boton"><IconMenuHamburguesa /></button>
+          <button className="icono-boton"><IconCampana /></button>
+        </div>
+
+        <section className="bienvenida-card">
+          <div>
+            <h2>🍃 ¡Hola, {nombreUsuario}! 🍃</h2>
+            <p>Tu esfuerzo hoy, te acerca a grandes logros. Sigue aprendiendo náhuatl.</p>
+          </div>
+          <img src="/mascota.png" alt="Mascota de Tanextli" className="bienvenida-mascota" />
+        </section>
+
+        <h3 className="menu-subtitulo">Selecciona una categoría para comenzar</h3>
+
+        <div className="categorias-grid">
+          {categorias.map((cat) => (
+            <CategoriaCard key={cat.titulo} {...cat} />
+          ))}
+        </div>
+      </main>
+    </div>
+  )
+}
+
+export default Menu
