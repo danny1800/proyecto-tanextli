@@ -10,8 +10,15 @@ const categorias = [
   { titulo: 'Frases', descripcion: 'Aprende unas frases en náhuatl', icono: '💬', color: 'verde', completadas: 0, total: 15, ruta: '/categoria/frases' },
 ]
 
-function Menu() {
-  const nombreUsuario = 'Karla'
+// "EDGAR BÁEZ SANTAMARÍA" -> "Edgar"
+function obtenerPrimerNombre(nombreCompleto) {
+  const primero = (nombreCompleto || '').trim().split(' ')[0]
+  if (!primero) return 'amigo'
+  return primero.charAt(0).toUpperCase() + primero.slice(1).toLowerCase()
+}
+
+function Menu({ usuario }) {
+  const nombreUsuario = obtenerPrimerNombre(usuario?.nombre_usuario)
 
   return (
     <div className="menu-layout">

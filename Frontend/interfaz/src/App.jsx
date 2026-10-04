@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import AuthScreen from './pages/Auth/AuthScreen'
-import { verificarSesion, cerrarSesion } from './services/authService'
+import { verificarSesion } from './services/authService'
 import Menu from './pages/Menu'
 import CategoriaIntro from './pages/catInfo'
 import Categoria from './pages/Categoria'
@@ -18,22 +18,19 @@ function App() {
     })
   }, [])
 
-  // Todavía no está conectado al botón "Cerrar sesión" del menú lateral
-  const salir = async () => {
-    await cerrarSesion()
-    setUsuario(null)
-  }
-
   if (revisando) return null
 
+  // Sin sesión: cualquier ruta (/menu, /categoria/...) muestra el login
   if (!usuario) return <AuthScreen onLogin={setUsuario} />
 
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/menu" replace />} />
-      <Route path="/menu" element={<Menu />} />
+      <Route path="/menu" element={<Menu usuario={usuario} />} />
       <Route path="/categoria/:id" element={<CategoriaIntro />} />
       <Route path="/categoria/:id/lecciones" element={<Categoria />} />
+      {/* Rutas que todavía no existen (perfil, configuración...) regresan al menú */}
+      <Route path="*" element={<Navigate to="/menu" replace />} />
     </Routes>
   )
 }

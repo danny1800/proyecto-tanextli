@@ -1,10 +1,17 @@
 import { NavLink } from 'react-router-dom'
+import { cerrarSesion } from '../services/authService'
 import {
   IconInicio, IconFamilia, IconColores, IconFrases,
   IconNumeros, IconPerfil, IconConfiguracion, IconSalir,
 } from './Icons'
 
 function Sidebar() {
+  // Borra la sesión y recarga la app en "/" para que aparezca el login
+  const salir = async () => {
+    await cerrarSesion()
+    window.location.replace('/')
+  }
+
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">🍃 Tanextli</div>
@@ -34,7 +41,7 @@ function Sidebar() {
         <NavLink to="/configuracion" className="sidebar-link">
           <IconConfiguracion /> Configuración
         </NavLink>
-        <button className="sidebar-link sidebar-salir" onClick={() => console.log('Cerrar sesión: pendiente')}>
+        <button type="button" className="sidebar-link sidebar-salir" onClick={salir}>
           <IconSalir /> Cerrar sesión
         </button>
       </div>
