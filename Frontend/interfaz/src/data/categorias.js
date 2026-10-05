@@ -1,5 +1,10 @@
-// Datos de ejemplo. Más adelante esto se reemplaza por lo que devuelva
-// el backend: fetch('http://localhost:3000/api/categorias')
+// Lecciones de ejemplo para las categorías que todavía no tienen contenido real
+const leccionesEjemplo = [
+  { id: 1, titulo: 'Parte 1', palabras: 5 },
+  { id: 2, titulo: 'Parte 2', palabras: 5 },
+  { id: 3, titulo: 'Parte 3', palabras: 5 },
+  { id: 4, titulo: 'Repaso', final: true },
+]
 
 export const categorias = {
   familia: {
@@ -8,11 +13,11 @@ export const categorias = {
     icono: '👪',
     color: 'naranja',
     lecciones: [
-      { id: 1, palabra: 'Nantli', traduccion: 'Madre' },
-      { id: 2, palabra: 'Tahtli', traduccion: 'Padre' },
-      { id: 3, palabra: 'Ichpochtli', traduccion: 'Hija' },
-      { id: 4, palabra: 'Telpochtli', traduccion: 'Hijo' },
-      { id: 5, palabra: 'Icniuhtli', traduccion: 'Hermano/a' },
+      { id: 1, titulo: 'Familia', palabras: 5 },
+      { id: 2, titulo: 'Familia extendida', palabras: 5 },
+      { id: 3, titulo: 'Más familiares', palabras: 9 },
+      { id: 4, titulo: 'Personas', palabras: 10 },
+      { id: 5, titulo: 'Repaso', final: true },
     ],
   },
   colores: {
@@ -20,38 +25,20 @@ export const categorias = {
     descripcion: 'Descubre los colores en náhuatl',
     icono: '🎨',
     color: 'morado',
-    lecciones: [
-      { id: 1, palabra: 'Chichiltic', traduccion: 'Rojo' },
-      { id: 2, palabra: 'Xoxoctic', traduccion: 'Verde' },
-      { id: 3, palabra: 'Iztac', traduccion: 'Blanco' },
-      { id: 4, palabra: 'Tliltic', traduccion: 'Negro' },
-      { id: 5, palabra: 'Coztic', traduccion: 'Amarillo' },
-    ],
+    lecciones: leccionesEjemplo,
   },
   numeros: {
     titulo: 'Números',
     descripcion: 'Aprende a contar en náhuatl',
     icono: '🔢',
     color: 'azul',
-    lecciones: [
-      { id: 1, palabra: 'Ce', traduccion: 'Uno' },
-      { id: 2, palabra: 'Ome', traduccion: 'Dos' },
-      { id: 3, palabra: 'Yei', traduccion: 'Tres' },
-      { id: 4, palabra: 'Nahui', traduccion: 'Cuatro' },
-      { id: 5, palabra: 'Macuilli', traduccion: 'Cinco' },
-    ],
+    lecciones: leccionesEjemplo,
   },
   frases: {
     titulo: 'Frases',
     descripcion: 'Aprende unas frases en náhuatl',
     icono: '💬',
     color: 'verde',
-    lecciones: [
-      { id: 1, palabra: 'Niltze', traduccion: 'Hola' },
-      { id: 2, palabra: 'Tlazocamati', traduccion: 'Gracias' },
-      { id: 3, palabra: 'Quen otimotlapaloa', traduccion: '¿Cómo estás?' },
-      { id: 4, palabra: 'Ximopanolti', traduccion: 'Bienvenido' },
-      { id: 5, palabra: 'Cualli tonalli', traduccion: 'Buen día' },
-    ],
+    lecciones: leccionesEjemplo,
   },
 }

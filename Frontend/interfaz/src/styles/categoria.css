@@ -8,79 +8,158 @@
 }
 .categoria-volver:hover { text-decoration: underline; }
 
-.categoria-header {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  border-radius: 12px;
-  padding: 20px 28px;
-  margin-bottom: 32px;
-}
-
-.categoria-header-icono {
-  font-size: 36px;
-}
-
-.categoria-header h2 { margin: 0 0 4px; }
-.categoria-header p { margin: 0; font-size: 14px; opacity: 0.85; }
-
-.lecciones-camino {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 18px;
-  max-width: 320px;
+.lec-contenedor {
+  max-width: 640px;
   margin: 0 auto;
 }
 
-.leccion-nodo {
+/* ---------- Encabezado ---------- */
+.lec-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.lec-header-texto {
   display: flex;
   align-items: center;
   gap: 14px;
-  width: 100%;
-  padding: 14px 18px;
-  border-radius: 12px;
-  text-decoration: none;
-  background: #fff;
-  border: 2px solid #dfe9e2;
-  color: #1f2a24;
-  font-weight: 600;
-  transition: transform 0.15s ease;
 }
 
-.leccion-numero {
-  width: 36px;
-  height: 36px;
-  min-width: 36px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.lec-hojas {
+  font-size: 42px;
+  line-height: 1;
+}
+
+.lec-header h1 {
+  margin: 0;
+  font-size: 30px;
   font-weight: 800;
-  background: #dfe9e2;
   color: #1b4332;
 }
 
-.leccion-nodo.completada {
-  border-color: #2d6a4f;
-  background: #eafaf0;
-}
-.leccion-nodo.completada .leccion-numero {
-  background: #2d6a4f;
-  color: #fff;
+.lec-header p {
+  margin: 2px 0 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2d6a4f;
 }
 
-.leccion-nodo.siguiente {
-  border-color: #1b4332;
-  box-shadow: 0 4px 14px rgba(27, 67, 50, 0.2);
+.lec-mascota {
+  width: 100px;
 }
-.leccion-nodo.siguiente .leccion-numero {
+
+/* ---------- Progreso ---------- */
+.lec-progreso {
+  background: #e1f5e7;
+  border: 2px solid #c3e3cc;
+  border-radius: 14px;
+  padding: 12px 18px;
+  margin-bottom: 18px;
+}
+
+.lec-progreso-titulo {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1b4332;
+}
+
+.lec-progreso-fila {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.lec-barra {
+  flex: 1;
+  height: 10px;
+  border-radius: 5px;
+  background: #c9d6cd;
+  overflow: hidden;
+}
+
+.lec-barra-relleno {
+  height: 100%;
+  border-radius: 5px;
   background: #1b4332;
-  color: #fff;
 }
-.leccion-nodo.siguiente:hover { transform: translateY(-2px); }
 
-.leccion-nodo.bloqueada {
-  opacity: 0.5;
+.lec-porcentaje {
+  font-size: 18px;
+  font-weight: 800;
+  color: #1b4332;
+}
+
+/* ---------- Lista de lecciones ---------- */
+.lec-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.lec-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 14px 20px;
+  background: #e1f5e7;
+  border: 2px solid #c3e3cc;
+  border-radius: 12px;
+  font-family: inherit;
+  text-align: left;
+  color: #1b4332;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.lec-card:hover:not(:disabled) {
+  transform: translateY(-2px);
+  border-color: #1b4332;
+}
+
+.lec-card:disabled {
   cursor: not-allowed;
+}
+
+.lec-card-icono svg {
+  width: 30px;
+  height: 30px;
+  color: #3a9a72;
+}
+
+.lec-card-texto {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.lec-card-etiqueta {
+  font-size: 12px;
+  font-weight: 600;
+  color: #2d6a4f;
+}
+
+.lec-card-titulo {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.lec-card-palabras {
+  font-size: 12px;
+  font-weight: 600;
+  color: #2d6a4f;
+}
+
+.lec-card-estado svg {
+  width: 30px;
+  height: 30px;
+  color: #1b4332;
+}
+
+@media (max-width: 600px) {
+  .lec-mascota { width: 70px; }
+  .lec-header h1 { font-size: 24px; }
 }
