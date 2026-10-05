@@ -5,6 +5,9 @@ import { verificarSesion } from './services/authService'
 import Menu from './pages/Menu'
 import CategoriaIntro from './pages/catInfo'
 import Categoria from './pages/Categoria'
+import AcercaDe from './pages/acercaDe'
+import Cargando from './components/Cargando'
+import NoEncontrada from './pages/NoEncontrada'
 
 function App() {
   const [usuario, setUsuario] = useState(null)
@@ -18,7 +21,7 @@ function App() {
     })
   }, [])
 
-  if (revisando) return null
+  if (revisando) return <Cargando />
 
   // Sin sesión: cualquier ruta (/menu, /categoria/...) muestra el login
   if (!usuario) return <AuthScreen onLogin={setUsuario} />
@@ -29,8 +32,10 @@ function App() {
       <Route path="/menu" element={<Menu usuario={usuario} />} />
       <Route path="/categoria/:id" element={<CategoriaIntro />} />
       <Route path="/categoria/:id/lecciones" element={<Categoria />} />
+      <Route path="/acerca-de" element={<AcercaDe />} />
       {/* Rutas que todavía no existen (perfil, configuración...) regresan al menú */}
       <Route path="*" element={<Navigate to="/menu" replace />} />
+      <Route path="*" element={<NoEncontrada />} />
     </Routes>
   )
 }

@@ -1,6 +1,6 @@
 import Sidebar from '../components/Sidebar'
 import CategoriaCard from '../components/CategoriaCard'
-import { IconMenuHamburguesa, IconCampana } from '../components/Icons'
+import {IconCampana } from '../components/Icons'
 import '../styles/menu.css'
 
 const categorias = [
@@ -26,7 +26,6 @@ function Menu({ usuario }) {
 
       <main className="menu-contenido">
         <div className="menu-topbar">
-          <button className="icono-boton"><IconMenuHamburguesa /></button>
           <button className="icono-boton"><IconCampana /></button>
         </div>
 

@@ -11,6 +11,12 @@
   display: flex;
   flex-direction: column;
   padding: 20px 14px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  align-self: flex-start;
+  flex-shrink: 0;
+  overflow-y: auto;
 }
 
 .sidebar-logo {
@@ -63,7 +69,7 @@
 
 .menu-topbar {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   margin-bottom: 20px;
 }
 
@@ -127,12 +133,23 @@
   border: 2px solid transparent;
   transition: transform 0.15s ease;
 }
-.categoria-card:hover { transform: translateY(-2px); }
 
-.categoria-card h3 { margin: 6px 0 4px; }
-.categoria-card p { margin: 0 0 14px; font-size: 13.5px; }
+.categoria-card:hover {
+  transform: translateY(-2px);
+}
 
-.categoria-icono { font-size: 26px; }
+.categoria-card h3 {
+  margin: 6px 0 4px;
+}
+
+.categoria-card p {
+  margin: 0 0 14px;
+  font-size: 13.5px;
+}
+
+.categoria-icono {
+  font-size: 26px;
+}
 
 .categoria-barra {
   height: 8px;
@@ -152,17 +169,52 @@
   font-weight: 700;
 }
 
-.categoria-naranja { background: #ffe4cf; color: #c2540a; }
-.categoria-morado  { background: #ecdcfb; color: #7a35c9; }
-.categoria-azul    { background: #d6e8fd; color: #1c63c4; }
-.categoria-verde   { background: #cdeed4; color: #1b4332; }
+.categoria-naranja {
+  background: #ffe4cf;
+  color: #c2540a;
+}
+
+.categoria-morado {
+  background: #ecdcfb;
+  color: #7a35c9;
+}
+
+.categoria-azul {
+  background: #d6e8fd;
+  color: #1c63c4;
+}
+
+.categoria-verde {
+  background: #cdeed4;
+  color: #1b4332;
+}
 
 @media (max-width: 760px) {
-  .menu-layout { flex-direction: column; }
-  .sidebar { width: 100%; flex-direction: row; overflow-x: auto; }
-  .sidebar-nav-abajo { margin-top: 0; border: none; }
-  .categorias-grid { grid-template-columns: 1fr; }
-  .bienvenida-card { flex-direction: column; text-align: center; }
+  .menu-layout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    flex-direction: row;
+    overflow-x: auto;
+    position: static;
+    height: auto;
+  }
+
+  .sidebar-nav-abajo {
+    margin-top: 0;
+    border: none;
+  }
+
+  .categorias-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bienvenida-card {
+    flex-direction: column;
+    text-align: center;
+  }
 }
 
 .sidebar .icono {
