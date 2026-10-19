@@ -4,14 +4,15 @@ import { categorias } from '../data/categorias'
 import {
   IconFamilia, IconColores, IconFrases, IconNumeros,
   IconBloqueado, IconCasilla, IconCasillaMarcada,
+  IconColoresVenn, IconNumeroHash,
 } from '../components/Icons'
 import '../styles/categoria.css'
 
 const iconosCategoria = {
   familia: IconFamilia,
-  colores: IconColores,
+  colores: IconColoresVenn,
   frases: IconFrases,
-  numeros: IconNumeros,
+  numeros: IconNumeroHash,
 }
 
 function Categoria() {

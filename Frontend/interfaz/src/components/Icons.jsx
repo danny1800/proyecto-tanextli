@@ -167,3 +167,22 @@ export function IconInfo() {
     </svg>
   )
 }
+
+export function IconColoresVenn() {
+  return (
+    <svg viewBox="0 0 32 32">
+      <circle cx="16" cy="10" r="8" fill="#4fc3f7" style={{ mixBlendMode: 'multiply' }} />
+      <circle cx="10" cy="20" r="8" fill="#f6e05e" style={{ mixBlendMode: 'multiply' }} />
+      <circle cx="22" cy="20" r="8" fill="#f87171" style={{ mixBlendMode: 'multiply' }} />
+    </svg>
+  )
+}
+
+export function IconNumeroHash() {
+  return (
+    <svg viewBox="0 0 32 32" fill="none" stroke="#1b4332" strokeWidth="3.2" strokeLinecap="round">
+      <path d="M12 5L9.5 27M22 5L19.5 27M5 12h22M4 21h22" />
+      <circle cx="5" cy="27" r="1.6" fill="#1b4332" stroke="none" />
+    </svg>
+  )
+}
