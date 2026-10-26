@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import AuthScreen from './pages/Auth/AuthScreen';
 import { verificarSesion, cerrarSesion } from './services/authService';
+import PruebaContenido from './components/PruebaContenido';
 
 export default function App() {
   const [usuario, setUsuario] = useState(null);
@@ -23,12 +24,14 @@ export default function App() {
 
   if (!usuario) return <AuthScreen onLogin={setUsuario} />;
 
-  // Aquí va el menú principal / Home de la app (reemplazar este bloque)
   return (
-    <div style={{ padding: 40, fontFamily: 'Segoe UI, sans-serif' }}>
-      <h1>¡Hola, {usuario.nombre_usuario}!</h1>
-      <p>Sesión iniciada como {usuario.correo}</p>
-      <button onClick={salir}>Cerrar sesión</button>
+    <div>
+      <PruebaContenido />
+
+      <div style={{ padding: 20 }}>
+        <p>Sesión iniciada como {usuario.correo}</p>
+        <button onClick={salir}>Cerrar sesión</button>
+      </div>
     </div>
   );
 }

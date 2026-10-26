@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { registrar, iniciarSesion, iniciarConGoogle } from '../../services/authService';
 import './AuthScreen.css';
+import { useEffect } from "react";
+import Mascota from "../../components/Mascota";
+import { useMascota } from "../../components/useMascota";
 
 export default function AuthScreen({ onLogin }) {
   const [esRegistro, setEsRegistro] = useState(false);
@@ -8,11 +11,21 @@ export default function AuthScreen({ onLogin }) {
   const [mensaje, setMensaje] = useState(null); // { texto, tipo: 'success' | 'error' }
   const [cargando, setCargando] = useState(false);
 
+  // NUEVO: la mascota (el mensaje se renombra porque arriba ya existe "mensaje")
+  const { estado, mensaje: mensajeMascota, reaccionar } = useMascota();
+
+  // NUEVO: saluda al abrir la pantalla
+  useEffect(() => {
+    reaccionar("saludando", "¡Hola! Vamos a aprender náhuatl", 3500);
+  }, []);
+
   const cambiar = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  
 
   const alternarModo = () => {
     setEsRegistro(!esRegistro);
     setMensaje(null);
+    reaccionar("feliz", esRegistro ? "¡Qué bueno verte de nuevo!" : "¡Crea tu cuenta!", 2500); 
   };
 
   const enviar = async (e) => {
@@ -21,9 +34,11 @@ export default function AuthScreen({ onLogin }) {
     setCargando(true);
     try {
       const usuario = esRegistro ? await registrar(form) : await iniciarSesion(form);
+      reaccionar("celebrando", esRegistro ? "¡Cuenta creada!" : "¡Bienvenido!", 2500); 
       onLogin?.(usuario);
     } catch (err) {
       setMensaje({ texto: err.message, tipo: 'error' });
+      reaccionar("error", "Revisa tus datos", 2500); // NUEVO
     } finally {
       setCargando(false);
     }
@@ -34,11 +49,13 @@ export default function AuthScreen({ onLogin }) {
     setCargando(true);
     try {
       const usuario = await iniciarConGoogle();
+      reaccionar("celebrando", "¡Bienvenido!", 2500); // NUEVO
       onLogin?.(usuario);
     } catch (err) {
       // Si el usuario cierra la ventana de Google no mostramos error
       if (err.code !== 'auth/popup-closed-by-user' && err.code !== 'auth/cancelled-popup-request') {
         setMensaje({ texto: err.message || 'No se pudo entrar con Google', tipo: 'error' });
+        reaccionar("error", "No se pudo entrar con Google", 2500); // NUEVO
       }
     } finally {
       setCargando(false);
@@ -61,8 +78,11 @@ export default function AuthScreen({ onLogin }) {
             nuestra raíz.
           </p>
 
-          <div className="auth__mascota">
-            <img src="/mascota.png" alt="Mascota de Tanextli" />
+         
+
+          {/* NUEVO: mascota animada */}
+          <div className="auth__mascota-animada">
+            <Mascota estado={estado} mensaje={mensajeMascota} tamano={260} />
           </div>
         </aside>
 
@@ -73,7 +93,11 @@ export default function AuthScreen({ onLogin }) {
 
           <h3 className="auth__form-title">{esRegistro ? 'Crear cuenta' : 'Inicia sesión'}</h3>
 
-          <form onSubmit={enviar} className="auth__form">
+          <form
+            onSubmit={enviar}
+            className="auth__form"
+            onFocus={() => reaccionar("escuchando", "", 4000)} 
+          >
             {esRegistro && (
               <div className="auth__group">
                 <label htmlFor="nombre_usuario">👤 Nombre de usuario</label>
@@ -159,4 +183,5 @@ export default function AuthScreen({ onLogin }) {
       </div>
     </div>
   );
+  
 }
