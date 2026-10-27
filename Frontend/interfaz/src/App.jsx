@@ -14,7 +14,7 @@ import Leccion from './pages/Leccion'
 
 function App() {
   const [usuario, setUsuario] = useState(null)
-  const [revisando, setRevisando] = useState(true)
+  const [revisando, setRevisando] = useState(false)
   const navigate = useNavigate()
   const [, setBienvenidaVista] = useState(0)
 

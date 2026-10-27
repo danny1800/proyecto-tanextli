@@ -19,11 +19,38 @@ export default function AuthScreen({ onLogin }) {
     e.preventDefault();
     setMensaje(null);
     setCargando(true);
+
     try {
-      const usuario = esRegistro ? await registrar(form) : await iniciarSesion(form);
-      onLogin?.(usuario);
+      if (esRegistro) {
+        // --- FLUJO DE REGISTRO ---
+        await registrar(form);
+        
+        // Al registrarse exitosamente: mandamos al usuario al Login
+        setMensaje({ 
+          texto: '¡Cuenta creada con éxito! Ahora puedes iniciar sesión con tus credenciales.', 
+          tipo: 'success' 
+        });
+        setEsRegistro(false); // Cambia automáticamente a la vista de Login
+      } else {
+        // --- FLUJO DE INICIO DE SESIÓN ---
+        const usuario = await iniciarSesion(form);
+        onLogin?.(usuario);
+      }
     } catch (err) {
-      setMensaje({ texto: err.message, tipo: 'error' });
+      if (!esRegistro) {
+        // Si falla el login (usuario no registrado o error de datos)
+        setMensaje({ 
+          texto: 'No se encontró la cuenta o datos incorrectos. Te redirigimos al Registro.', 
+          tipo: 'error' 
+        });
+        
+        // Redirigimos automáticamente a la vista de Registro
+        setTimeout(() => {
+          setEsRegistro(true);
+        }, 1200);
+      } else {
+        setMensaje({ texto: err.message, tipo: 'error' });
+      }
     } finally {
       setCargando(false);
     }
@@ -36,7 +63,6 @@ export default function AuthScreen({ onLogin }) {
       const usuario = await iniciarConGoogle();
       onLogin?.(usuario);
     } catch (err) {
-      // Si el usuario cierra la ventana de Google no mostramos error
       if (err.code !== 'auth/popup-closed-by-user' && err.code !== 'auth/cancelled-popup-request') {
         setMensaje({ texto: err.message || 'No se pudo entrar con Google', tipo: 'error' });
       }
