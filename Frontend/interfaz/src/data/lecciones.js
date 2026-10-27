@@ -20,21 +20,69 @@
 // Las lecciones que no aparezcan aquí muestran "estará lista muy pronto".
 // ============================================================
 
+// ---------- Familia (palabras de Palabras_Tanextl_v2_nahualt.xlsx) ----------
+// AQUÍ VA EL AUDIO: cuando graben cada palabra, cambien  audio: null
+// por la ruta del archivo, por ejemplo  audio: '/audios/familia/papan.mp3'
+// (el archivo se guarda en public/audios/familia/).
+//
+// Sin "unir" a propósito: Hermano/Hermana, Primo/Prima y Sobrino/Sobrina
+// se escriben igual en náhuatl y esa actividad no puede distinguirlos.
+
+const familiaLeccion1 = [
+  { nahuatl: 'Cenchan', espanol: 'Familia', audio: null },
+  { nahuatl: 'Papan', espanol: 'Padre', audio: null },
+  { nahuatl: 'Maman', espanol: 'Madre', audio: null },
+  { nahuatl: 'Noikniuj', espanol: 'Hermano', audio: null },
+  { nahuatl: 'Noikniuj', espanol: 'Hermana', audio: null },
+]
+
+const familiaLeccion2 = [
+  { nahuatl: 'Tatatsin', espanol: 'Abuelo', audio: null },
+  { nahuatl: 'Nanatsin', espanol: 'Abuela', audio: null },
+  { nahuatl: 'Noikniuj papan', espanol: 'Tío', audio: null },
+  { nahuatl: 'Noikniuj maman', espanol: 'Tía', audio: null },
+  { nahuatl: 'Nomajichniuj', espanol: 'Primo', audio: null },
+]
+
+const familiaLeccion3 = [
+  { nahuatl: 'Nomajichniuj', espanol: 'Prima', audio: null },
+  { nahuatl: 'Noixuiuj', espanol: 'Nieto', audio: null },
+  { nahuatl: 'Noiuiuj', espanol: 'Nieta', audio: null },
+  { nahuatl: 'Nokonemaj', espanol: 'Sobrino', audio: null },
+  { nahuatl: 'Nokonemaj', espanol: 'Sobrina', audio: null },
+  { nahuatl: 'Monnantsin', espanol: 'Suegra', audio: null },
+  { nahuatl: 'Motatsin', espanol: 'Suegro', audio: null },
+  { nahuatl: 'Noikniuj ni cihuat', espanol: 'Cuñada', audio: null },
+  { nahuatl: 'Noikniuj ni tagat', espanol: 'Cuñado', audio: null },
+]
+
+const familiaLeccion4 = [
+  { nahuatl: 'Okichpil', espanol: 'Niño', audio: null },
+  { nahuatl: 'Suapil', espanol: 'Niña', audio: null },
+  { nahuatl: 'Tagat', espanol: 'Señor', audio: null },
+  { nahuatl: 'Cihuatsin', espanol: 'Señora', audio: null },
+  { nahuatl: 'Wuehuet', espanol: 'Hombre', audio: null },
+  { nahuatl: 'Lamat', espanol: 'Mujer', audio: null },
+  { nahuatl: 'Pili', espanol: 'Bebé', audio: null },
+  { nahuatl: 'Vevetsin', espanol: 'Viejo', audio: null },
+  { nahuatl: 'Nanatsin', espanol: 'Vieja', audio: null },
+  { nahuatl: 'Telpoch', espanol: 'Joven', audio: null },
+]
+
 export const contenidoLecciones = {
   familia: {
-    1: {
-      palabras: [
-        { nahuatl: 'Tahtli', espanol: 'Padre', audio: '/audios/familia/tahtli.mp3' },
-        { nahuatl: 'Nantli', espanol: 'Madre', audio: '/audios/familia/nantli.mp3' },
-        // REEMPLAZA estas tres palabras de ejemplo por las reales de la lección 1:
-        { nahuatl: 'Palabra 3', espanol: 'Ejemplo 3' },
-        { nahuatl: 'Palabra 4', espanol: 'Ejemplo 4' },
-        { nahuatl: 'Palabra 5', espanol: 'Ejemplo 5' },
-      ],
+    1: { palabras: familiaLeccion1 },
+    2: { palabras: familiaLeccion2 },
+    3: { palabras: familiaLeccion3 },
+    4: { palabras: familiaLeccion4 },
+    // Lección final: repaso de las 29 palabras (sin "escuchar", solo actividades)
+    5: {
+      actividades: ['opcion', 'escritura'],
+      palabras: [...familiaLeccion1, ...familiaLeccion2, ...familiaLeccion3, ...familiaLeccion4],
     },
   },
 
-      colores: {
+  colores: {
     // Lección 1: colores básicos
     1: {
       actividades: ['escuchar', 'unir', 'opcion', 'escritura'],
