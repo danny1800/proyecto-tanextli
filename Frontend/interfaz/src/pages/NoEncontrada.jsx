@@ -14,7 +14,7 @@ function NoEncontrada() {
             {/* NUEVO: la imagen fija quedó comentada (no borrada) */}
             {/* <img src="/mascota.png" alt="Mascota de Tanextli" className="nf-mascota" /> */}
             <div className="nf-mascota">
-              <Mascota estado="animo" tamano="mediano" />
+              <Mascota rutina="noEncontrada" tamano="grande" entrada="rebote" />
             </div>
             <p className="nf-codigo">404</p>
             <h1>Esta página no existe</h1>

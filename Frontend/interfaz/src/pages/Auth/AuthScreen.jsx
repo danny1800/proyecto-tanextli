@@ -118,7 +118,7 @@ export default function AuthScreen({ onLogin }) {
 
           {/* NUEVO: mascota animada en el lugar de la imagen */}
           <div className="auth__mascota-animada">
-            <MascotaAnimada estado={estado} mensaje={mensajeMascota} tamano={260} mirada={mirada} />
+            <MascotaAnimada estado={estado} mensaje={mensajeMascota} tamano={320} mirada={mirada} entrada="rebote" />
           </div>
         </aside>
 

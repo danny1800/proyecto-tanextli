@@ -219,7 +219,9 @@
     text-align: center;
   }
     .bienvenida-mascota {
-    margin: 0;
+    width: 180px;
+  flex-shrink: 0;
+  margin: -40px 0;
   }
 }
 

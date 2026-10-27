@@ -57,7 +57,7 @@ function AcercaDe() {
             {/* NUEVO: la imagen fija quedó comentada (no borrada) */}
             {/* <img src="/mascota.png" alt="Mascota de Tanextli" className="acerca-mascota" /> */}
             <div className="acerca-mascota">
-              <Mascota estado="feliz" tamano="pequeno" />
+              <Mascota rutina="acerca" tamano="pequeno" entrada="zoom" />
             </div>
           </section>
 

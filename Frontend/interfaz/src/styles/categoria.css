@@ -47,10 +47,9 @@
 }
 
 .lec-mascota {
-  width: 110px;
+    width: 180px;
   flex-shrink: 0;
-  /* NUEVO: evita que el encabezado crezca por la altura de la mascota animada */
-  margin: -14px 0 -6px;
+  margin: -34px 0 -14px;
 }
 
 /* ---------- Progreso ---------- */

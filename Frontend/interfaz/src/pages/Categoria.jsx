@@ -52,7 +52,7 @@ function Categoria() {
             {/* NUEVO: la imagen fija quedó comentada (no borrada) */}
             {/* <img src="/mascota.png" alt="Mascota de Tanextli" className="lec-mascota" /> */}
             <div className="lec-mascota">
-              <Mascota estado="escucha" tamano="pequeno" />
+              <Mascota rutina="categoria" tamano="pequeno" entrada="deslizar" />
             </div>
           </header>
 

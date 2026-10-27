@@ -57,14 +57,13 @@
 }
 
 .acerca-mascota {
-  position: relative;
+   position: relative;
   z-index: 1;
-  width: 130px;
+  width: 180px;
   flex-shrink: 0;
   display: flex;
   justify-content: center;
-  /* NUEVO: evita que el encabezado crezca por la altura de la mascota animada */
-  margin: -10px 0;
+  margin: -28px 0;
 }
 
 /* ---------- Tarjetas ---------- */

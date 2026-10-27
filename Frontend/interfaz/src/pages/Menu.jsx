@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react' // NUEVO
 import Sidebar from '../components/Sidebar'
 import CategoriaCard from '../components/CategoriaCard'
 import {IconCampana } from '../components/Icons'
@@ -22,13 +21,6 @@ function obtenerPrimerNombre(nombreCompleto) {
 function Menu({ usuario }) {
   const nombreUsuario = obtenerPrimerNombre(usuario?.nombre_usuario)
 
-  // NUEVO: la mascota saluda unos segundos y luego se queda tranquila
-  const [estadoMascota, setEstadoMascota] = useState('saludo')
-  useEffect(() => {
-    const t = setTimeout(() => setEstadoMascota('reposo'), 3500)
-    return () => clearTimeout(t)
-  }, [])
-
   return (
     <div className="menu-layout">
       <Sidebar />
@@ -46,7 +38,7 @@ function Menu({ usuario }) {
           {/* NUEVO: la imagen fija quedó comentada (no borrada) */}
           {/* <img src="/mascota.png" alt="Mascota de Tanextli" className="bienvenida-mascota" /> */}
           <div className="bienvenida-mascota">
-            <Mascota estado={estadoMascota} tamano="pequeno" />
+            <Mascota rutina="menu" tamano="pequeno" entrada="asomar" />
           </div>
         </section>
 

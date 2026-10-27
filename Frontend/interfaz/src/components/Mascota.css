@@ -1,8 +1,10 @@
 /* =====================================================================
-   MASCOTA TANEXTLI — animación por capas (v4)
+   MASCOTA TANEXTLI — animación por capas (v5)
    Cada pieza se mueve sola: cuerpo, brazo, mano (muñeca), cola, cabeza, orejas,
    cejas, ojos (parpadeo y pupilas que miran) y boca.
    Para cambiar cómo se ve un estado, edita su bloque (busca:  data-estado="saludando")
+   NOTA: todas las clases de este archivo empiezan con  mxa  o  m-  para no chocar
+   con los estilos del equipo.
    ===================================================================== */
 
 /* Variables que se animan suavemente al cambiar de estado */
@@ -23,10 +25,40 @@
   gap: 10px;
 }
 
-/* ---------- Lienzo: todas las capas miden lo mismo y se apilan ---------- */
+/* El "ancla" es la caja que mide justo lo mismo que la mascota. El globo flotante
+   se pega arriba de ella sin ocupar espacio, así la pantalla NO se mueve cuando aparece */
+.mxa-ancla { position: relative; display: flow-root; }
+
+.mxa-flota {
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 280px;
+  margin-bottom: 6px;
+  z-index: 30;
+  pointer-events: none;
+}
+.mxa-flota .mxa-globo,
+.mxa-flota .mascota-globo { margin: 0; max-width: 280px; }
+
+/* ---------- Marco: recorta lo que se sale, así la pantalla NO se mueve ----------
+   Las piezas de la mascota giran y saltan. Sin este marco, esos movimientos hacen que la
+   página crezca y se encoja unos píxeles, la barra de desplazamiento aparece y desaparece
+   y TODO el contenido se corre de lado a lado. El marco deja espacio extra arriba y a los
+   lados (para saltos y balanceos) y corta lo que pase de ahí. No ocupa espacio en la
+   pantalla: los márgenes negativos compensan el relleno. */
 .mxa {
   position: relative;
-  aspect-ratio: 640 / 877;
+  display: block;
+  box-sizing: content-box;
+  width: calc(var(--u) * 640);
+  padding: calc(var(--u) * 100) calc(var(--u) * 60) 0;
+  margin: calc(var(--u) * -100) calc(var(--u) * -60) 0;
+  overflow: hidden;
+  overflow: clip;
+  pointer-events: none;
   user-select: none;
 
   /* valores por defecto (todo quieto) */
@@ -39,7 +71,7 @@
   --oi-rot: 0deg; --od-rot: 0deg;                  /* orejas (postura)          */
   --ci-rot: 0deg; --ci-y: 0;                       /* ceja izquierda            */
   --cd-rot: 0deg; --cd-y: 0;                       /* ceja derecha              */
-  --mx: 0; --my: 0;                                /* hacia dónde miran los ojos (lo pone Mascota.jsx) */
+  --mx: 0; --my: 0;                                /* hacia dónde miran los ojos (lo pone MascotaAnimada.jsx) */
 
   transition:
     --b-base .55s cubic-bezier(.3, 1.25, .5, 1), --b-amp .5s ease,
@@ -49,6 +81,15 @@
     --o-amp .5s ease;
 }
 
+/* El lienzo es la caja de 640 x 877 donde se apilan todas las capas */
+.mxa-lienzo {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 640 / 877;
+}
+
+
+.m-entrada,
 .m-todo,
 .m-brazo,
 .m-mano-g,
@@ -75,7 +116,15 @@
    PIEZAS
    ===================================================================== */
 
-/* Todo el cuerpo: respirar, saltar, temblar... (gira desde los pies) */
+/* Entrada: cómo aparece la mascota al abrirse la pantalla (se elige con  entrada="..." ) */
+.m-entrada { transform-origin: 47.7% 97.1%; }
+.m-entrada-rebote    { animation: entrada-rebote 1s cubic-bezier(.3, 1.2, .5, 1) both; }
+.m-entrada-deslizar  { animation: entrada-deslizar .8s cubic-bezier(.2, .9, .3, 1) both; }
+.m-entrada-asomar    { animation: entrada-asomar .9s cubic-bezier(.3, 1.3, .5, 1) both; }
+.m-entrada-zoom      { animation: entrada-zoom .7s cubic-bezier(.3, 1.4, .5, 1) both; }
+.m-entrada-aparecer  { animation: entrada-aparecer .8s ease both; }
+
+/* Todo el cuerpo: respirar, saltar, bailar, temblar... (gira desde los pies) */
 .m-todo {
   transform-origin: 47.7% 97.1%;
   animation: respirar 3.4s ease-in-out infinite;
@@ -184,59 +233,62 @@
    mano (w):   giro en la muñeca. Máximo recomendado: base + amp = 12deg
    cola (c):   base/amp en grados
    cabeza (h): rot/y = postura fija (y negativo = sube) · amp/bob/dur = vaivén
-   orejas (o): oi-rot/od-rot = postura (negativo = hacia afuera/caída en la izquierda) · amp/dur = vaivén
+   orejas (o): oi-rot/od-rot = postura · amp/dur = vaivén
    cejas:      rot = giro · y negativo = suben
+   Límites para que el dibujo no se rompa: cabeza rot ±8deg, y entre -6 y 10 · orejas hasta 15deg
    ===================================================================== */
 
 /* --- reposo: respira, brazo relajado, mira a los lados y mueve una oreja de vez en cuando --- */
 .mxa[data-estado="reposo"] {
-  --b-base: -86deg; --b-amp: 3deg;  --b-dur: 3.2s;
-  --w-base: 6deg;  --w-amp: 2deg;
-  --c-base: 4deg;  --c-amp: 6deg;  --c-dur: 2.6s;
-  --h-amp: 1.2deg; --h-bob: -2;    --h-dur: 3.2s;
+  --b-base: -86deg; --b-amp: 3deg; --b-dur: 3.2s;
+  --w-base: 6deg; --w-amp: 2deg;
+  --c-base: 4deg; --c-amp: 6deg; --c-dur: 2.6s;
+  --h-amp: 1.2deg; --h-bob: -2; --h-dur: 3.2s;
   --o-amp: 1.5deg; --o-dur: 3.6s;
 }
 
 /* --- saludando: el brazo saluda y la mano se dobla en la muñeca --- */
 .mxa[data-estado="saludando"] {
   --b-base: -6deg; --b-amp: 17deg; --b-dur: .55s;
-  --w-base: 0deg;  --w-amp: 11deg;
-  --c-base: 5deg;  --c-amp: 12deg; --c-dur: .7s;
-  --h-rot: 3deg;   --h-y: -3;
-  --h-amp: 3deg;   --h-bob: -2;    --h-dur: .55s;
-  --o-amp: 3deg;   --o-dur: 1.1s;
+  --w-base: 0deg; --w-amp: 11deg;
+  --c-base: 5deg; --c-amp: 12deg; --c-dur: .7s;
+  --h-rot: 3deg; --h-y: -3;
+  --h-amp: 3deg; --h-bob: -2; --h-dur: .55s;
+  --o-amp: 3deg; --o-dur: 1.1s;
   --ci-y: -3; --cd-y: -3;
 }
 
 /* --- hablando: gesticula con el brazo, cabeza con pequeños asentimientos, boca animada --- */
 .mxa[data-estado="hablando"] {
   --b-base: -52deg; --b-amp: 12deg; --b-dur: 1.3s;
-  --w-base: 4deg;  --w-amp: 6deg;
-  --c-base: 4deg;  --c-amp: 7deg;  --c-dur: 1.4s;
-  --h-amp: 1.8deg; --h-bob: -2;    --h-dur: .5s;
-  --o-amp: 2deg;   --o-dur: 1.6s;
+  --w-base: 4deg; --w-amp: 6deg;
+  --c-base: 4deg; --c-amp: 7deg; --c-dur: 1.4s;
+  --h-amp: 1.8deg; --h-bob: -2; --h-dur: .5s;
+  --o-amp: 2deg; --o-dur: 1.6s;
   --ci-y: -2; --cd-y: -2;
 }
 
 /* --- escuchando: ladea la cabeza, orejas atentas hacia adelante, cejas arriba --- */
 .mxa[data-estado="escuchando"] {
-  --b-base: -80deg; --b-amp: 2deg;  --b-dur: 3s;
-  --w-base: 5deg;  --w-amp: 2deg;
-  --c-base: -4deg; --c-amp: 4deg;  --c-dur: 2s;
-  --h-rot: -6deg;  --h-y: -2;
-  --h-amp: .8deg;  --h-bob: 0;     --h-dur: 3s;
-  --o-amp: 1deg;   --o-dur: 3s;    --oi-rot: 6deg; --od-rot: -6deg;
+  --b-base: -80deg; --b-amp: 2deg; --b-dur: 3s;
+  --w-base: 5deg; --w-amp: 2deg;
+  --c-base: -4deg; --c-amp: 4deg; --c-dur: 2s;
+  --h-rot: -6deg; --h-y: -2;
+  --h-amp: .8deg; --h-bob: 0; --h-dur: 3s;
+  --o-amp: 1deg; --o-dur: 3s;
+  --oi-rot: 6deg; --od-rot: -6deg;
   --ci-y: -6; --cd-y: -6;
 }
 
 /* --- pensando: mira hacia arriba, una ceja arriba, mano cerca de la cara, boca "hmm" --- */
 .mxa[data-estado="pensando"] {
-  --b-base: 12deg; --b-amp: 2deg;  --b-dur: 2.5s;
-  --w-base: 8deg;  --w-amp: 3deg;
-  --c-base: 0deg;  --c-amp: 3deg;  --c-dur: 2s;
-  --h-rot: 6deg;   --h-y: -3;
-  --h-amp: 1deg;   --h-bob: -1;    --h-dur: 2.4s;
-  --o-amp: 1.5deg; --o-dur: 2.6s;  --oi-rot: 8deg; --od-rot: -2deg;
+  --b-base: 12deg; --b-amp: 2deg; --b-dur: 2.5s;
+  --w-base: 8deg; --w-amp: 3deg;
+  --c-base: 0deg; --c-amp: 3deg; --c-dur: 2s;
+  --h-rot: 6deg; --h-y: -3;
+  --h-amp: 1deg; --h-bob: -1; --h-dur: 2.4s;
+  --o-amp: 1.5deg; --o-dur: 2.6s;
+  --oi-rot: 8deg; --od-rot: -2deg;
   --ci-rot: -8deg; --ci-y: -9;
   --cd-rot: -6deg; --cd-y: 2;
 }
@@ -244,22 +296,22 @@
 /* --- feliz: ojos en arco, cabeza alegre, brazo y orejas con movimiento suave --- */
 .mxa[data-estado="feliz"] {
   --b-base: -6deg; --b-amp: 10deg; --b-dur: .9s;
-  --w-base: 0deg;  --w-amp: 8deg;
-  --c-base: 6deg;  --c-amp: 12deg; --c-dur: .6s;
-  --h-rot: 4deg;   --h-y: -3;
-  --h-amp: 2deg;   --h-bob: -3;    --h-dur: 1.2s;
-  --o-amp: 3deg;   --o-dur: .9s;
+  --w-base: 0deg; --w-amp: 8deg;
+  --c-base: 6deg; --c-amp: 12deg; --c-dur: .6s;
+  --h-rot: 4deg; --h-y: -3;
+  --h-amp: 2deg; --h-bob: -3; --h-dur: 1.2s;
+  --o-amp: 3deg; --o-dur: .9s;
   --ci-y: -5; --cd-y: -5;
 }
 
 /* --- celebrando: salta, agita el brazo, la mano, la cola y las orejas --- */
 .mxa[data-estado="celebrando"] {
   --b-base: -4deg; --b-amp: 14deg; --b-dur: .35s;
-  --w-base: 0deg;  --w-amp: 12deg;
-  --c-base: 6deg;  --c-amp: 16deg; --c-dur: .35s;
+  --w-base: 0deg; --w-amp: 12deg;
+  --c-base: 6deg; --c-amp: 16deg; --c-dur: .35s;
   --h-y: -4;
-  --h-amp: 4deg;   --h-bob: -4;    --h-dur: .5s;
-  --o-amp: 7deg;   --o-dur: .35s;
+  --h-amp: 4deg; --h-bob: -4; --h-dur: .5s;
+  --o-amp: 7deg; --o-dur: .35s;
   --ci-y: -7; --cd-y: -7;
 }
 .mxa[data-estado="celebrando"] .m-todo { animation: saltar 1s ease-in-out infinite; }
@@ -268,10 +320,11 @@
 .mxa[data-estado="triste"] {
   --b-base: -88deg; --b-amp: 1.5deg; --b-dur: 3s;
   --w-base: 10deg; --w-amp: 1deg;
-  --c-base: 22deg; --c-amp: 1deg;  --c-dur: 3s;
-  --h-rot: 3deg;   --h-y: 8;
-  --h-amp: .8deg;  --h-bob: 0;     --h-dur: 3.5s;
-  --o-amp: .8deg;  --o-dur: 3.5s;  --oi-rot: -14deg; --od-rot: 14deg;
+  --c-base: 22deg; --c-amp: 1deg; --c-dur: 3s;
+  --h-rot: 3deg; --h-y: 8;
+  --h-amp: .8deg; --h-bob: 0; --h-dur: 3.5s;
+  --o-amp: .8deg; --o-dur: 3.5s;
+  --oi-rot: -14deg; --od-rot: 14deg;
   --ci-rot: -16deg; --ci-y: -3;
   --cd-rot: 16deg;  --cd-y: -3;
 }
@@ -279,28 +332,134 @@
 
 /* --- sorprendida: cabeza arriba, orejas paradas, cejas arriba, boca en "o", brinquito --- */
 .mxa[data-estado="sorprendida"] {
-  --b-base: 8deg;  --b-amp: 3deg;  --b-dur: 1.2s;
-  --w-base: 0deg;  --w-amp: 3deg;
-  --c-base: -8deg; --c-amp: 8deg;  --c-dur: .5s;
+  --b-base: 8deg; --b-amp: 3deg; --b-dur: 1.2s;
+  --w-base: 0deg; --w-amp: 3deg;
+  --c-base: -8deg; --c-amp: 8deg; --c-dur: .5s;
   --h-y: -5;
-  --h-amp: 0deg;   --h-bob: 0;     --h-dur: 3s;
-  --o-amp: .8deg;  --o-dur: 1.2s;  --oi-rot: 8deg; --od-rot: -8deg;
+  --h-amp: 0deg; --h-bob: 0; --h-dur: 3s;
+  --o-amp: .8deg; --o-dur: 1.2s;
+  --oi-rot: 8deg; --od-rot: -8deg;
   --ci-y: -11; --cd-y: -11;
 }
 .mxa[data-estado="sorprendida"] .m-todo { animation: brinco .7s ease-out 1; }
 
 /* --- error (respuesta incorrecta): tiembla, orejas bajas, cejas preocupadas --- */
 .mxa[data-estado="error"] {
-  --b-base: -72deg; --b-amp: 5deg;  --b-dur: .2s;
-  --w-base: 8deg;  --w-amp: 4deg;
-  --c-base: 14deg; --c-amp: 3deg;  --c-dur: .3s;
-  --h-rot: 2deg;   --h-y: 4;
-  --h-amp: 2deg;   --h-bob: 0;     --h-dur: .2s;
-  --o-amp: 2deg;   --o-dur: .2s;   --oi-rot: -10deg; --od-rot: 10deg;
+  --b-base: -72deg; --b-amp: 5deg; --b-dur: .2s;
+  --w-base: 8deg; --w-amp: 4deg;
+  --c-base: 14deg; --c-amp: 3deg; --c-dur: .3s;
+  --h-rot: 2deg; --h-y: 4;
+  --h-amp: 2deg; --h-bob: 0; --h-dur: .2s;
+  --o-amp: 2deg; --o-dur: .2s;
+  --oi-rot: -10deg; --od-rot: 10deg;
   --ci-rot: -14deg; --ci-y: -2;
   --cd-rot: 14deg;  --cd-y: -2;
 }
 .mxa[data-estado="error"] .m-todo { animation: temblar .55s ease-in-out 3; }
+
+/* --- bailando: balancea todo el cuerpo de lado a lado, brazo y cola a todo ritmo, orejas aleteando --- */
+.mxa[data-estado="bailando"] {
+  --b-base: -4deg; --b-amp: 18deg; --b-dur: .6s;
+  --w-base: 0deg; --w-amp: 12deg;
+  --c-base: 6deg; --c-amp: 20deg; --c-dur: .3s;
+  --h-y: -2;
+  --h-amp: 5deg; --h-bob: -4; --h-dur: .6s;
+  --o-amp: 9deg; --o-dur: .3s;
+  --ci-y: -6; --cd-y: -6;
+}
+.mxa[data-estado="bailando"] .m-todo { animation: bailar 1.2s ease-in-out infinite; }
+
+/* --- pirueta: salta y da una vuelta completa en el aire --- */
+.mxa[data-estado="pirueta"] {
+  --b-base: -10deg; --b-amp: 10deg; --b-dur: .5s;
+  --w-base: 0deg; --w-amp: 10deg;
+  --c-base: 8deg; --c-amp: 18deg; --c-dur: .3s;
+  --h-y: -4;
+  --h-amp: 3deg; --h-bob: -3; --h-dur: .5s;
+  --o-amp: 6deg; --o-dur: .3s;
+  --ci-y: -7; --cd-y: -7;
+}
+.mxa[data-estado="pirueta"] .m-todo { animation: pirueta 1.8s ease-in-out infinite; }
+
+/* --- emocionada: rebota sin parar, brazo agitándose, ojos muy abiertos --- */
+.mxa[data-estado="emocionada"] {
+  --b-base: -2deg; --b-amp: 20deg; --b-dur: .3s;
+  --w-base: 0deg; --w-amp: 12deg;
+  --c-base: 6deg; --c-amp: 20deg; --c-dur: .25s;
+  --h-y: -3;
+  --h-amp: 3deg; --h-bob: -3; --h-dur: .25s;
+  --o-amp: 8deg; --o-dur: .25s;
+  --ci-y: -8; --cd-y: -8;
+}
+.mxa[data-estado="emocionada"] .m-todo { animation: rebote .5s ease-in-out infinite; }
+
+/* --- agradecida: asiente despacio con la cabeza baja y los ojos felices (como dando las gracias) --- */
+.mxa[data-estado="agradecida"] {
+  --b-base: -84deg; --b-amp: 2deg; --b-dur: 3s;
+  --w-base: 6deg; --w-amp: 2deg;
+  --c-base: 6deg; --c-amp: 3deg; --c-dur: 2.4s;
+  --h-rot: 4deg; --h-y: 7;
+  --h-amp: 1deg; --h-bob: 1; --h-dur: 2.2s;
+  --o-amp: 1deg; --o-dur: 2.2s;
+  --oi-rot: -5deg; --od-rot: 5deg;
+  --ci-y: -2; --cd-y: -2;
+}
+.mxa[data-estado="agradecida"] .m-todo { animation: asentir 2.2s ease-in-out infinite; }
+
+/* --- curiosa: se inclina hacia un lado y otro, mira de reojo, una ceja arriba --- */
+.mxa[data-estado="curiosa"] {
+  --b-base: -48deg; --b-amp: 6deg; --b-dur: 2.2s;
+  --w-base: 8deg; --w-amp: 3deg;
+  --c-base: -6deg; --c-amp: 8deg; --c-dur: 1.8s;
+  --h-rot: -7deg; --h-y: -2;
+  --h-amp: 1deg; --h-bob: 0; --h-dur: 2.4s;
+  --o-amp: 2deg; --o-dur: 1.4s;
+  --oi-rot: 8deg; --od-rot: -8deg;
+  --ci-rot: -6deg; --ci-y: -9;
+  --cd-y: -4;
+}
+.mxa[data-estado="curiosa"] .m-todo { animation: asomar 3.2s ease-in-out infinite; }
+
+/* --- timida: cabeza baja, mira hacia abajo, orejas caídas, se balancea despacito --- */
+.mxa[data-estado="timida"] {
+  --b-base: -86deg; --b-amp: 1.5deg; --b-dur: 3.4s;
+  --w-base: 10deg; --w-amp: 1deg;
+  --c-base: 18deg; --c-amp: 2deg; --c-dur: 3s;
+  --h-rot: -5deg; --h-y: 8;
+  --h-amp: .8deg; --h-bob: 0; --h-dur: 3.4s;
+  --o-amp: .8deg; --o-dur: 3.4s;
+  --oi-rot: -10deg; --od-rot: 10deg;
+  --ci-rot: -10deg; --ci-y: -2;
+  --cd-rot: 10deg;  --cd-y: -2;
+}
+.mxa[data-estado="timida"] .m-todo { animation: balanceo 3.2s ease-in-out infinite; }
+
+/* --- orgullosa: levanta la cabeza, saca el pecho y se infla un poco, con el brazo abierto --- */
+.mxa[data-estado="orgullosa"] {
+  --b-base: -50deg; --b-amp: 3deg; --b-dur: 2.6s;
+  --w-base: 6deg; --w-amp: 2deg;
+  --c-base: -8deg; --c-amp: 6deg; --c-dur: 2.2s;
+  --h-y: -6;
+  --h-amp: .6deg; --h-bob: 0; --h-dur: 2.8s;
+  --o-amp: 1.5deg; --o-dur: 2.8s;
+  --oi-rot: 4deg; --od-rot: -4deg;
+  --ci-y: -5; --cd-y: -5;
+}
+.mxa[data-estado="orgullosa"] .m-todo { animation: inflar 2.8s ease-in-out infinite; }
+
+/* --- sonolienta: ojos cerrados, cabeza que cabecea, respira lento y profundo --- */
+.mxa[data-estado="sonolienta"] {
+  --b-base: -86deg; --b-amp: 1deg; --b-dur: 5s;
+  --w-base: 8deg; --w-amp: 1deg;
+  --c-base: 16deg; --c-amp: 1.5deg; --c-dur: 5s;
+  --h-rot: 4deg; --h-y: 8;
+  --h-amp: 1.5deg; --h-bob: 2; --h-dur: 5s;
+  --o-amp: .6deg; --o-dur: 5s;
+  --oi-rot: -10deg; --od-rot: 10deg;
+  --ci-rot: -10deg; --ci-y: 2;
+  --cd-rot: 10deg;  --cd-y: 2;
+}
+.mxa[data-estado="sonolienta"] .m-todo { animation: respiro-lento 5s ease-in-out infinite; }
 
 /* =====================================================================
    ANIMACIONES (keyframes)
@@ -341,6 +500,7 @@
   78%      { transform: rotate(calc(-3deg * var(--sg))); }
 }
 
+/* ---------- Movimientos de todo el cuerpo ---------- */
 @keyframes respirar {
   0%, 100% { transform: scale(1, 1); }
   50%      { transform: scale(1.006, 1.014); }
@@ -378,6 +538,96 @@
   to { transform: translateY(calc(var(--u) * 6)) scale(1.01, .965); }
 }
 
+/* NUEVO: baile, se balancea de lado a lado con un saltito en cada extremo */
+@keyframes bailar {
+  0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1, 1); }
+  12%  { transform: translate(calc(var(--u) * -10), 0) rotate(-4deg) scale(1.03, .96); }
+  25%  { transform: translate(calc(var(--u) * -12), calc(var(--u) * -8)) rotate(-5deg) scale(.98, 1.04); }
+  50%  { transform: translate(0, 0) rotate(0deg) scale(1.03, .96); }
+  62%  { transform: translate(calc(var(--u) * 10), 0) rotate(4deg) scale(1.03, .96); }
+  75%  { transform: translate(calc(var(--u) * 12), calc(var(--u) * -8)) rotate(5deg) scale(.98, 1.04); }
+}
+
+/* NUEVO: pirueta, salta y gira una vuelta completa (de frente, de lado, de espaldas y otra vez) */
+@keyframes pirueta {
+  0%   { transform: translate(0, 0) scale(1, 1); }
+  10%  { transform: translate(0, 0) scale(1.06, .92); }
+  28%  { transform: translate(0, calc(var(--u) * -34)) scale(.55, 1.05); }
+  40%  { transform: translate(0, calc(var(--u) * -46)) scale(-.2, 1.06); }
+  50%  { transform: translate(0, calc(var(--u) * -48)) scale(-1, 1.04); }
+  62%  { transform: translate(0, calc(var(--u) * -42)) scale(-.2, 1.06); }
+  74%  { transform: translate(0, calc(var(--u) * -14)) scale(.7, 1.02); }
+  84%  { transform: translate(0, 0) scale(1.06, .92); }
+  92%  { transform: translate(0, 0) scale(1, 1); }
+  100% { transform: translate(0, 0) scale(1, 1); }
+}
+
+/* NUEVO: rebote continuo y corto (emocionada) */
+@keyframes rebote {
+  0%, 100% { transform: translate(0, 0) scale(1, 1); }
+  20%  { transform: translate(0, 0) scale(1.05, .93); }
+  50%  { transform: translate(0, calc(var(--u) * -18)) scale(.97, 1.05); }
+  80%  { transform: translate(0, 0) scale(1.04, .95); }
+}
+
+/* NUEVO: asentir despacio (agradecida) */
+@keyframes asentir {
+  0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1, 1); }
+  50%      { transform: translate(0, calc(var(--u) * 3)) rotate(4deg) scale(1, .985); }
+}
+
+/* NUEVO: se asoma inclinándose de un lado a otro (curiosa) */
+@keyframes asomar {
+  0%, 100% { transform: translate(calc(var(--u) * -6), 0) rotate(-3deg) scale(1.02, 1.02); }
+  50%      { transform: translate(calc(var(--u) * 6), 0) rotate(3deg) scale(1.04, 1.04); }
+}
+
+/* NUEVO: balanceo lento (tímida) */
+@keyframes balanceo {
+  0%, 100% { transform: translate(calc(var(--u) * -3), 0) rotate(-2deg) scale(1, 1); }
+  50%      { transform: translate(calc(var(--u) * 3), 0) rotate(2deg) scale(1, 1); }
+}
+
+/* NUEVO: se infla un poco, pecho afuera (orgullosa) */
+@keyframes inflar {
+  0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1, 1); }
+  50%      { transform: translate(0, calc(var(--u) * -3)) rotate(0deg) scale(1.03, 1.03); }
+}
+
+/* NUEVO: respiración lenta y profunda (soñolienta) */
+@keyframes respiro-lento {
+  0%, 100% { transform: translate(0, 0) scale(1, 1); }
+  50%      { transform: translate(0, calc(var(--u) * 3)) scale(1.015, 1.03); }
+}
+
+/* ---------- Entradas ---------- */
+@keyframes entrada-rebote {
+  0%   { opacity: 0; transform: translateY(calc(var(--u) * -90)) scale(1, 1); }
+  45%  { opacity: 1; transform: translateY(0) scale(1.06, .9); }
+  65%  { transform: translateY(calc(var(--u) * -18)) scale(.97, 1.04); }
+  82%  { transform: translateY(0) scale(1.03, .96); }
+  100% { opacity: 1; transform: translateY(0) scale(1, 1); }
+}
+@keyframes entrada-deslizar {
+  0%   { opacity: 0; transform: translateX(calc(var(--u) * 140)); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+@keyframes entrada-asomar {
+  0%   { opacity: 0; transform: translateY(calc(var(--u) * 140)); }
+  60%  { opacity: 1; transform: translateY(calc(var(--u) * -12)); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes entrada-zoom {
+  0%   { opacity: 0; transform: scale(.3); }
+  70%  { opacity: 1; transform: scale(1.08); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes entrada-aparecer {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ---------- Ojos y boca ---------- */
 @keyframes pestaneo-abre {
   0%, 92%     { opacity: 1; }
   93.5%       { opacity: 0; }
@@ -403,7 +653,7 @@
 }
 
 /* =====================================================================
-   GLOBO DE DIÁLOGO
+   GLOBO DE DIÁLOGO (el de la mascota animada cuando se usa directo, como en el login)
    ===================================================================== */
 .mxa-globo {
   position: relative;
