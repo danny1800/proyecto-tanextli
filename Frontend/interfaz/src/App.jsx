@@ -1,37 +1,58 @@
-import { useEffect, useState } from 'react';
-import AuthScreen from './pages/Auth/AuthScreen';
-import { verificarSesion, cerrarSesion } from './services/authService';
-import PruebaContenido from './components/PruebaContenido';
+import { useEffect, useState } from 'react'
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
+import AuthScreen from './pages/Auth/AuthScreen'
+import { verificarSesion } from './services/authService'
+import Menu from './pages/Menu'
+import CategoriaIntro from './pages/catInfo'
+import Categoria from './pages/Categoria'
+import AcercaDe from './pages/acercaDe'
+import Cargando from './components/Cargando'
+import NoEncontrada from './pages/NoEncontrada'
+import Onboarding from './pages/Onboarding'
+import { onboardingPendiente, marcarOnboardingCompletado } from './services/onboarding'
 
-export default function App() {
-  const [usuario, setUsuario] = useState(null);
-  const [revisando, setRevisando] = useState(true);
+function App() {
+  const [usuario, setUsuario] = useState(null)
+  const [revisando, setRevisando] = useState(false)
+  const navigate = useNavigate()
+  const [, setBienvenidaVista] = useState(0)
 
   // Al abrir la app, revisa si ya había una sesión iniciada
   useEffect(() => {
     verificarSesion().then((u) => {
-      setUsuario(u);
-      setRevisando(false);
-    });
-  }, []);
+      setUsuario(u)
+      setRevisando(false)
+    })
+  }, [])
 
-  const salir = async () => {
-    await cerrarSesion();
-    setUsuario(null);
-  };
+  if (revisando) return <Cargando />
 
-  if (revisando) return null;
-
-  if (!usuario) return <AuthScreen onLogin={setUsuario} />;
+  // Sin sesión: cualquier ruta (/menu, /categoria/...) muestra el login
+  if (!usuario) return <AuthScreen onLogin={setUsuario} />
+  if (onboardingPendiente(usuario)) {
+  return (
+    <Onboarding
+      onTerminar={() => {
+        marcarOnboardingCompletado(usuario)
+        setBienvenidaVista((n) => n + 1)
+      }}
+    />
+  )
+}
 
   return (
-    <div>
-      <PruebaContenido />
-
-      <div style={{ padding: 20 }}>
-        <p>Sesión iniciada como {usuario.correo}</p>
-        <button onClick={salir}>Cerrar sesión</button>
-      </div>
-    </div>
-  );
+    <Routes>
+      <Route path="/" element={<Navigate to="/menu" replace />} />
+      <Route path="/menu" element={<Menu usuario={usuario} />} />
+      <Route path="/categoria/:id" element={<CategoriaIntro />} />
+      <Route path="/categoria/:id/lecciones" element={<Categoria />} />
+      <Route path="/acerca-de" element={<AcercaDe />} />
+      <Route path="/bienvenida" element={<Onboarding onTerminar={() => navigate('/menu')} />} />
+      {/* Rutas que todavía no existen (perfil, configuración...) regresan al menú */}
+      <Route path="*" element={<Navigate to="/menu" replace />} />
+      <Route path="*" element={<NoEncontrada />} />
+    </Routes>
+  )
 }
+
+export default App

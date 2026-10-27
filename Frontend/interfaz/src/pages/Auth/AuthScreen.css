@@ -180,5 +180,11 @@
   display: flex;
   justify-content: center;
   margin-top: 16px;
+
+  /* NUEVO: lugar de la mascota animada */
+.auth__mascota-animada {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
 }
 }
