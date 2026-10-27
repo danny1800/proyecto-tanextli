@@ -570,7 +570,7 @@ function ReproductorLeccion({ categoriaId, leccion, palabras, actividades, onRep
           <div className="lp-progreso-relleno" style={{ width: `${Math.round((indice / total) * 100)}%` }}></div>
         </div>
       )}
-      <main className="lp-contenido" key={terminado ? 'fin' : indice}>
+      <main className={`lp-contenido ${indice % 2 === 1 ? 'lado-izquierdo' : ''}`} key={terminado ? 'fin' : indice}>
         {contenido}
       </main>
     </div>
