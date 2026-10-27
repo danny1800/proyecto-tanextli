@@ -10,6 +10,7 @@ import Cargando from './components/Cargando'
 import NoEncontrada from './pages/NoEncontrada'
 import Onboarding from './pages/Onboarding'
 import { onboardingPendiente, marcarOnboardingCompletado } from './services/onboarding'
+import Leccion from './pages/Leccion'
 
 function App() {
   const [usuario, setUsuario] = useState(null)
@@ -48,6 +49,7 @@ function App() {
       <Route path="/categoria/:id/lecciones" element={<Categoria />} />
       <Route path="/acerca-de" element={<AcercaDe />} />
       <Route path="/bienvenida" element={<Onboarding onTerminar={() => navigate('/menu')} />} />
+      <Route path="/categoria/:id/leccion/:leccionId" element={<Leccion />} />
       {/* Rutas que todavía no existen (perfil, configuración...) regresan al menú */}
       <Route path="*" element={<Navigate to="/menu" replace />} />
       <Route path="*" element={<NoEncontrada />} />

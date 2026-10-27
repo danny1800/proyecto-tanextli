@@ -1,4 +1,5 @@
-import { useParams, Link, Navigate } from 'react-router-dom'
+import { useParams, Link, Navigate, useNavigate } from 'react-router-dom'
+import { cantidadCompletadas } from '../services/progreso'
 import Sidebar from '../components/Sidebar'
 import Mascota from '../components/Mascota' // NUEVO
 import { categorias } from '../data/categorias'
@@ -12,16 +13,17 @@ import '../styles/categoria.css'
 const iconosCategoria = {
   familia: IconFamilia,
   colores: IconColoresVenn,
-  frases: IconFrases,
+  frases:  IconFrases,
   numeros: IconNumeroHash,
 }
 
 function Categoria() {
   const { id } = useParams()
+  const navigate = useNavigate()
   const categoria = categorias[id]
 
   // Lecciones que lleva completadas el usuario (por ahora 0; luego vendrá del backend)
-  const leccionesCompletadas = 0
+  const leccionesCompletadas = cantidadCompletadas(id)
 
   if (!categoria) {
     return <Navigate to="/menu" replace />
@@ -75,7 +77,7 @@ function Categoria() {
                   key={leccion.id}
                   className={`lec-card ${completada ? 'completada' : ''} ${bloqueada ? 'bloqueada' : ''}`}
                   disabled={bloqueada}
-                  onClick={() => console.log('Pendiente: abrir', categoria.titulo, leccion.titulo)}
+                  onClick={() => navigate(`/categoria/${id}/leccion/${leccion.id}`)}
                 >
                   <span className="lec-card-icono"><IconoCategoria /></span>
                   <span className="lec-card-texto">

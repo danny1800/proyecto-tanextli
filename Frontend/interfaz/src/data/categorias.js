@@ -21,7 +21,7 @@ export const categorias = {
     color: 'morado',
     lecciones: [
       { id: 1, titulo: 'Colores básicos', palabras: 5 },
-      { id: 2, titulo: 'Colores secundarios', palabras: 5 },
+      { id: 2, titulo: 'Colores secundarios', palabras: 6 },
       { id: 3, titulo: 'Repaso general', final: true },
     ],
   },
