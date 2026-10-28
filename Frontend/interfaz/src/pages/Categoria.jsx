@@ -1,6 +1,7 @@
 import { useParams, Link, Navigate, useNavigate } from 'react-router-dom'
 import { cantidadCompletadas } from '../services/progreso'
 import Sidebar from '../components/Sidebar'
+import Mascota from '../components/Mascota' // NUEVO
 import { categorias } from '../data/categorias'
 import {
   IconFamilia, IconColores, IconFrases, IconNumeros,
@@ -48,7 +49,11 @@ function Categoria() {
                 <p>¿Estás listo para empezar?</p>
               </div>
             </div>
-            <img src="/mascota.png" alt="Mascota de Tanextli" className="lec-mascota" />
+            {/* NUEVO: la imagen fija quedó comentada (no borrada) */}
+            {/* <img src="/mascota.png" alt="Mascota de Tanextli" className="lec-mascota" /> */}
+            <div className="lec-mascota">
+              <Mascota rutina="categoria" tamano="pequeno" entrada="deslizar" />
+            </div>
           </header>
 
           <section className="lec-progreso">

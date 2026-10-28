@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
+import Mascota from '../components/Mascota' // NUEVO
 import '../styles/noEncontrada.css'
 
 function NoEncontrada() {
@@ -10,7 +11,11 @@ function NoEncontrada() {
       <main className="menu-contenido">
         <div className="nf-contenedor">
           <div className="nf-tarjeta">
-            <img src="/mascota.png" alt="Mascota de Tanextli" className="nf-mascota" />
+            {/* NUEVO: la imagen fija quedó comentada (no borrada) */}
+            {/* <img src="/mascota.png" alt="Mascota de Tanextli" className="nf-mascota" /> */}
+            <div className="nf-mascota">
+              <Mascota rutina="noEncontrada" tamano="grande" entrada="rebote" />
+            </div>
             <p className="nf-codigo">404</p>
             <h1>Esta página no existe</h1>
             <p className="nf-texto">

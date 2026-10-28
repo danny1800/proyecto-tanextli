@@ -17,9 +17,9 @@
 }
 
 .nf-mascota {
-  width: 110px;
+  display: flex;
+  justify-content: center;
   margin-bottom: 8px;
-  border-radius: 16px;
 }
 
 .nf-codigo {

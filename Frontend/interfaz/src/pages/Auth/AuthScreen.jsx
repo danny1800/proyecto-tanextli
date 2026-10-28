@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react'; // NUEVO: se agregó useEffect
 import { registrar, iniciarSesion, iniciarConGoogle } from '../../services/authService';
+import MascotaAnimada from '../../components/MascotaAnimada'; // NUEVO
+import { useMascota } from '../../components/useMascota'; // NUEVO
 import './AuthScreen.css';
 
 export default function AuthScreen({ onLogin }) {
@@ -8,22 +10,34 @@ export default function AuthScreen({ onLogin }) {
   const [mensaje, setMensaje] = useState(null); // { texto, tipo: 'success' | 'error' }
   const [cargando, setCargando] = useState(false);
 
+  // NUEVO: mascota animada (el mensaje se llama distinto porque arriba ya existe "mensaje")
+  const [mirada, setMirada] = useState(null);
+  const { estado, mensaje: mensajeMascota, reaccionar } = useMascota();
+
+  // NUEVO: saluda al abrir la pantalla
+  useEffect(() => {
+    reaccionar('saludando', '¡Hola! Vamos a aprender náhuatl', 3500);
+  }, []);
+
   const cambiar = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const alternarModo = () => {
     setEsRegistro(!esRegistro);
     setMensaje(null);
+    reaccionar('feliz', esRegistro ? '¡Qué bueno verte de nuevo!' : '¡Crea tu cuenta!', 2500); // NUEVO
   };
 
   const enviar = async (e) => {
     e.preventDefault();
     setMensaje(null);
     setCargando(true);
+    reaccionar('pensando', 'Un momento…', 10000); // NUEVO
 
     try {
       if (esRegistro) {
         // --- FLUJO DE REGISTRO ---
         await registrar(form);
+        reaccionar('celebrando', '¡Cuenta creada!', 2500); // NUEVO
         
         // Al registrarse exitosamente: mandamos al usuario al Login
         setMensaje({ 
@@ -34,6 +48,7 @@ export default function AuthScreen({ onLogin }) {
       } else {
         // --- FLUJO DE INICIO DE SESIÓN ---
         const usuario = await iniciarSesion(form);
+        reaccionar('celebrando', '¡Bienvenido!', 2500); // NUEVO
         onLogin?.(usuario);
       }
     } catch (err) {
@@ -43,13 +58,16 @@ export default function AuthScreen({ onLogin }) {
           texto: 'No se encontró la cuenta o datos incorrectos. Te redirigimos al Registro.', 
           tipo: 'error' 
         });
+        reaccionar('error', 'No encontré tu cuenta', 1800); // NUEVO
         
         // Redirigimos automáticamente a la vista de Registro
         setTimeout(() => {
           setEsRegistro(true);
+          reaccionar('feliz', '¡Crea tu cuenta!', 2500); // NUEVO
         }, 1200);
       } else {
         setMensaje({ texto: err.message, tipo: 'error' });
+        reaccionar('error', 'Revisa tus datos', 2500); // NUEVO
       }
     } finally {
       setCargando(false);
@@ -59,12 +77,17 @@ export default function AuthScreen({ onLogin }) {
   const entrarConGoogle = async () => {
     setMensaje(null);
     setCargando(true);
+    reaccionar('pensando', 'Un momento…', 10000); // NUEVO
     try {
       const usuario = await iniciarConGoogle();
+      reaccionar('celebrando', '¡Bienvenido!', 2500); // NUEVO
       onLogin?.(usuario);
     } catch (err) {
       if (err.code !== 'auth/popup-closed-by-user' && err.code !== 'auth/cancelled-popup-request') {
         setMensaje({ texto: err.message || 'No se pudo entrar con Google', tipo: 'error' });
+        reaccionar('error', 'No se pudo entrar con Google', 2500); // NUEVO
+      } else {
+        reaccionar('reposo', '', 100); // NUEVO: cerró la ventana de Google, vuelve a lo normal
       }
     } finally {
       setCargando(false);
@@ -87,8 +110,15 @@ export default function AuthScreen({ onLogin }) {
             nuestra raíz.
           </p>
 
+          {/* NUEVO: la imagen fija quedó comentada (no borrada)
           <div className="auth__mascota">
             <img src="/mascota.png" alt="Mascota de Tanextli" />
+          </div>
+          */}
+
+          {/* NUEVO: mascota animada en el lugar de la imagen */}
+          <div className="auth__mascota-animada">
+            <MascotaAnimada estado={estado} mensaje={mensajeMascota} tamano={320} mirada={mirada} entrada="rebote" />
           </div>
         </aside>
 
@@ -99,7 +129,12 @@ export default function AuthScreen({ onLogin }) {
 
           <h3 className="auth__form-title">{esRegistro ? 'Crear cuenta' : 'Inicia sesión'}</h3>
 
-          <form onSubmit={enviar} className="auth__form">
+          <form
+            onSubmit={enviar}
+            className="auth__form"
+            onFocus={() => { reaccionar('escuchando', '', 4000); setMirada([4, 1]); }} // NUEVO
+            onBlur={() => setMirada(null)} // NUEVO
+          >
             {esRegistro && (
               <div className="auth__group">
                 <label htmlFor="nombre_usuario">👤 Nombre de usuario</label>

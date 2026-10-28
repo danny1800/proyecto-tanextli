@@ -1,6 +1,7 @@
 import Sidebar from '../components/Sidebar'
 import CategoriaCard from '../components/CategoriaCard'
 import {IconCampana } from '../components/Icons'
+import Mascota from '../components/Mascota' // NUEVO
 import '../styles/menu.css'
 
 const categorias = [
@@ -34,7 +35,11 @@ function Menu({ usuario }) {
             <h2>🍃 ¡Hola, {nombreUsuario}! 🍃</h2>
             <p>Tu esfuerzo hoy, te acerca a grandes logros. Sigue aprendiendo náhuatl.</p>
           </div>
-          <img src="/mascota.png" alt="Mascota de Tanextli" className="bienvenida-mascota" />
+          {/* NUEVO: la imagen fija quedó comentada (no borrada) */}
+          {/* <img src="/mascota.png" alt="Mascota de Tanextli" className="bienvenida-mascota" /> */}
+          <div className="bienvenida-mascota">
+            <Mascota rutina="menu" tamano="pequeno" entrada="asomar" />
+          </div>
         </section>
 
         <h3 className="menu-subtitulo">Selecciona una categoría para comenzar</h3>

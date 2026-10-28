@@ -110,7 +110,10 @@
 }
 
 .bienvenida-mascota {
-  width: 90px;
+  width: 110px;
+  flex-shrink: 0;
+  /* NUEVO: la mascota animada es más alta que la imagen; este margen evita que la tarjeta crezca de más */
+  margin: -18px 0;
 }
 
 .menu-subtitulo {
@@ -214,6 +217,11 @@
   .bienvenida-card {
     flex-direction: column;
     text-align: center;
+  }
+    .bienvenida-mascota {
+    width: 180px;
+  flex-shrink: 0;
+  margin: -40px 0;
   }
 }
 

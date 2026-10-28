@@ -1,4 +1,5 @@
 import Sidebar from '../components/Sidebar'
+import Mascota from '../components/Mascota' // NUEVO
 import { IconAltavoz, IconMicrofono, IconDocumento, IconLapiz } from '../components/Icons'
 import '../styles/acercaDe.css'
 
@@ -53,7 +54,11 @@ function AcercaDe() {
               <h1>Tanextli</h1>
               <p className="acerca-lema">Conecta con tu lengua, nuestra raíz.</p>
             </div>
-            <img src="/mascota.png" alt="Mascota de Tanextli" className="acerca-mascota" />
+            {/* NUEVO: la imagen fija quedó comentada (no borrada) */}
+            {/* <img src="/mascota.png" alt="Mascota de Tanextli" className="acerca-mascota" /> */}
+            <div className="acerca-mascota">
+              <Mascota rutina="acerca" tamano="pequeno" entrada="zoom" />
+            </div>
           </section>
 
           <section className="acerca-tarjeta">

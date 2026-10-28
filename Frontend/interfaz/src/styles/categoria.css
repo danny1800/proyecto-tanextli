@@ -47,7 +47,9 @@
 }
 
 .lec-mascota {
-  width: 100px;
+    width: 180px;
+  flex-shrink: 0;
+  margin: -34px 0 -14px;
 }
 
 /* ---------- Progreso ---------- */
@@ -160,6 +162,7 @@
 }
 
 @media (max-width: 600px) {
-  .lec-mascota { width: 70px; }
+    .lec-mascota { width: 80px; }
+  .lec-mascota .mascota { transform: scale(0.72); transform-origin: right center; }
   .lec-header h1 { font-size: 24px; }
 }

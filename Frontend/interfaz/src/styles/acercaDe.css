@@ -57,10 +57,13 @@
 }
 
 .acerca-mascota {
-  position: relative;
+   position: relative;
   z-index: 1;
-  width: 130px;
-  border-radius: 16px;
+  width: 180px;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  margin: -28px 0;
 }
 
 /* ---------- Tarjetas ---------- */
