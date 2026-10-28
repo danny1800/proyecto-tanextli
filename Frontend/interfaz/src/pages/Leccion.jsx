@@ -63,7 +63,11 @@ function construirFases(palabras, todasLasPalabras, actividades) {
         const deLaCategoria = todasLasPalabras.filter(
           (q) => q.nahuatl !== p.nahuatl && !deLaLeccion.some((r) => r.nahuatl === q.nahuatl)
         )
-        const distractores = [...mezclar(deLaLeccion), ...mezclar(deLaCategoria)].slice(0, 3)
+                // Sin repetir palabras: Hermano y Hermana se escriben igual (Noikniuj)
+        const vistas = new Set([p.nahuatl])
+        const distractores = [...mezclar(deLaLeccion), ...mezclar(deLaCategoria)]
+          .filter((q) => !vistas.has(q.nahuatl) && vistas.add(q.nahuatl))
+          .slice(0, 3)
         fases.push({ tipo, palabra: p, opciones: mezclar([p, ...distractores]), numero: numeroDe(tipo), de })
       })
     } else if (tipo === 'escritura') {
