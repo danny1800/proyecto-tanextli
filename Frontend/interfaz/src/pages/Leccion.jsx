@@ -23,9 +23,17 @@ function elegir(lista) {
   return lista[Math.floor(Math.random() * lista.length)]
 }
 
-// Quita mayúsculas, espacios y acentos para comparar lo que escribe el usuario
+// Quita mayúsculas, acentos, signos y espacios de más para comparar lo que escribe el usuario
 function normalizar(texto) {
-  return texto.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  return texto
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/['’‘ʼ]/g, '')
+    .replace(/[¿?¡!.,;:"“”()\-–]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
 }
 
 function mezclar(lista) {
@@ -42,7 +50,7 @@ function mezclar(lista) {
 function sonar(src) {
   if (!src) return
   const audio = new Audio(src)
-  audio.play().catch(() => {})
+  audio.play().catch(() => { })
 }
 
 // Arma la lista de pasos de la lección en el orden que indique "actividades"
@@ -63,7 +71,7 @@ function construirFases(palabras, todasLasPalabras, actividades) {
         const deLaCategoria = todasLasPalabras.filter(
           (q) => q.nahuatl !== p.nahuatl && !deLaLeccion.some((r) => r.nahuatl === q.nahuatl)
         )
-                // Sin repetir palabras: Hermano y Hermana se escriben igual (Noikniuj)
+        // Sin repetir palabras: Hermano y Hermana se escriben igual (Noikniuj)
         const vistas = new Set([p.nahuatl])
         const distractores = [...mezclar(deLaLeccion), ...mezclar(deLaCategoria)]
           .filter((q) => !vistas.has(q.nahuatl) && vistas.add(q.nahuatl))
@@ -454,7 +462,9 @@ function PasoEscritura({ palabra, numero, de, onSiguiente }) {
 
       <div className="lp-tarjeta">
         {palabra.colorHex && <Muestra color={palabra.colorHex} />}
-        <p className="lp-pregunta">¿Cómo se dice {palabra.espanol.toLowerCase()} en náhuatl?</p>
+        <p className="lp-pregunta">
+          ¿Cómo se dice «{palabra.espanol.replace(/^[¿¡\s]+|[?!.\s]+$/g, '').toLowerCase()}» en náhuatl?
+        </p>
         <input
           ref={campoRef}
           className={`lp-input ${resultado === 'correcto' ? 'correcta' : resultado === 'incorrecto' ? 'incorrecta' : ''}`}

@@ -51,4 +51,18 @@ export const categorias = {
       { id: 4, titulo: 'Repaso general', final: true },
     ],
   },
+
+    frases: {
+    titulo: 'Frases comunes',
+    descripcion: 'Aprende unas frases en náhuatl',
+    icono: '💬',
+    color: 'verde',
+    lecciones: [
+      { id: 1, titulo: 'Saludos', palabras: 5, icono: 'mano' },
+      { id: 2, titulo: 'Conversación', palabras: 5, icono: 'conversacion' },
+      { id: 3, titulo: 'Expresiones', palabras: 9, icono: 'triste' }, // el diseño dice 9 palabras: confirmar
+      { id: 4, titulo: 'Despedida', palabras: 5, icono: 'mano' },
+      { id: 5, titulo: 'Repaso general', final: true },
+    ],
+  },
 }

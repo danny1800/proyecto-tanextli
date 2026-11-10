@@ -6,7 +6,7 @@ import { categorias } from '../data/categorias'
 import {
   IconFamilia, IconColores, IconFrases, IconNumeros,
   IconBloqueado, IconCasilla, IconCasillaMarcada,
-  IconColoresVenn, IconNumeroHash,
+  IconColoresVenn, IconNumeroHash,IconMano, IconConversacion, IconCaraTriste,
 } from '../components/Icons'
 import '../styles/categoria.css'
 
@@ -15,6 +15,13 @@ const iconosCategoria = {
   colores: IconColoresVenn,
   frases:  IconFrases,
   numeros: IconNumeroHash,
+}
+
+// Íconos propios de cada lección (cuando la lección trae "icono" en categorias.js)
+const iconosLeccion = {
+  mano: IconMano,
+  conversacion: IconConversacion,
+  triste: IconCaraTriste,
 }
 
 function Categoria() {
@@ -68,6 +75,7 @@ function Categoria() {
 
           <div className="lec-lista">
             {categoria.lecciones.map((leccion, index) => {
+              const IconoLeccion = iconosLeccion[leccion.icono] || IconoCategoria
               const completada = index < leccionesCompletadas
               const bloqueada = index > leccionesCompletadas
               const etiqueta = leccion.final ? 'Lección final' : `Lección ${leccion.id}`
@@ -79,7 +87,7 @@ function Categoria() {
                   disabled={bloqueada}
                   onClick={() => navigate(`/categoria/${id}/leccion/${leccion.id}`)}
                 >
-                  <span className="lec-card-icono"><IconoCategoria /></span>
+                  <span className="lec-card-icono"><IconoLeccion /></span>
                   <span className="lec-card-texto">
                     <span className="lec-card-etiqueta">{etiqueta}</span>
                     <span className="lec-card-titulo">{leccion.titulo}</span>

@@ -186,3 +186,45 @@ export function IconNumeroHash() {
     </svg>
   )
 }
+
+export function IconMano() {
+  return (
+    <svg viewBox="0 0 32 32" fill="#1b4332">
+      <rect x="6.6" y="10" width="3.8" height="11" rx="1.9" transform="rotate(-12 8.5 15)" />
+      <rect x="11" y="5.5" width="3.8" height="16" rx="1.9" transform="rotate(-4 13 13)" />
+      <rect x="15.6" y="4.5" width="3.8" height="17" rx="1.9" transform="rotate(3 17.5 13)" />
+      <rect x="20.2" y="6.5" width="3.8" height="15" rx="1.9" transform="rotate(10 22 14)" />
+      <path d="M7.4 17.5h16.6v3.2c0 5.2-3.6 8.8-8.5 8.8-4.3 0-8.1-3-8.1-7.6Z" />
+      <path d="M7.8 18.6C5.2 16.8 3.4 17.4 3.4 19.4c0 1.6 2.3 4.6 4.8 6.4Z" />
+    </svg>
+  )
+}
+
+export function IconConversacion() {
+  return (
+    <svg viewBox="0 0 32 32">
+      <path
+        fill="#1b4332"
+        d="M5 4h22a2.5 2.5 0 0 1 2.5 2.5v14A2.5 2.5 0 0 1 27 23H14.5L8 28.5V23H5a2.5 2.5 0 0 1-2.5-2.5v-14A2.5 2.5 0 0 1 5 4Z"
+      />
+      <path d="M8 10h16M8 15.5h10" stroke="#e1f5e7" strokeWidth="2.4" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+export function IconCaraTriste() {
+  return (
+    <svg viewBox="0 0 32 32">
+      <circle cx="16" cy="16" r="13.5" fill="#2d7a55" />
+      <circle cx="11.2" cy="13" r="1.9" fill="#e1f5e7" />
+      <circle cx="20.8" cy="13" r="1.9" fill="#e1f5e7" />
+      <path
+        d="M9.8 23.4c1.6-3.2 4.2-4.4 6.2-4.4s4.6 1.2 6.2 4.4"
+        stroke="#e1f5e7"
+        strokeWidth="2.4"
+        fill="none"
+        strokeLinecap="round"
+      />
+    </svg>
+  )
+}
