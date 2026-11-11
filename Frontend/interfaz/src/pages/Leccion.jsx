@@ -431,10 +431,15 @@ function PasoOpcionMultiple({ palabra, opciones, numero, de, onSiguiente }) {
 
 /* ---------- Paso: escritura ---------- */
 
+// Después de cuántos errores aparece la ayuda para recordar cómo se escribe
+const AYUDA_DESDE = 2
+
 function PasoEscritura({ palabra, numero, de, onSiguiente }) {
+  const { reproducir, aviso } = useAudio(palabra.audio)
   const [texto, setTexto] = useState('')
   const [resultado, setResultado] = useState(null) // null | correcto | incorrecto
   const [fallos, setFallos] = useState(0)
+  const [verRespuesta, setVerRespuesta] = useState(false)
   const campoRef = useRef(null)
 
   useEffect(() => {
@@ -452,9 +457,6 @@ function PasoEscritura({ palabra, numero, de, onSiguiente }) {
     setTexto('')
     setResultado(null)
   }
-
-  // Después de dos errores se da una pequeña pista
-  const pista = fallos >= 2 ? `Pista: empieza con «${palabra.nahuatl.charAt(0)}»` : null
 
   return (
     <>
@@ -475,6 +477,27 @@ function PasoEscritura({ palabra, numero, de, onSiguiente }) {
           onChange={(e) => setTexto(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && resultado === null && comprobar()}
         />
+
+        {fallos >= AYUDA_DESDE && resultado !== 'correcto' && (
+          <div className="lp-ayuda-escritura">
+            <p className="lp-ayuda-titulo">¿No recuerdas cómo se escribe?</p>
+            {verRespuesta ? (
+              <p className="lp-respuesta">
+                Se escribe: <strong>{palabra.nahuatl}</strong>
+              </p>
+            ) : (
+              <button className="lp-enlace" onClick={() => setVerRespuesta(true)}>
+                Ver cómo se escribe
+              </button>
+            )}
+            {palabra.audio && (
+              <button className="lp-enlace" onClick={reproducir}>
+                Escuchar la palabra
+              </button>
+            )}
+            {aviso && <p className="lp-aviso">No se pudo reproducir el audio.</p>}
+          </div>
+        )}
       </div>
 
       {resultado === null && <MascotaPista pista="¡Recuerda cómo lo aprendimos!" />}
@@ -484,7 +507,6 @@ function PasoEscritura({ palabra, numero, de, onSiguiente }) {
       ) : (
         <BarraResultado
           resultado={resultado}
-          detalle={resultado === 'incorrecto' ? pista : null}
           textoBoton={resultado === 'correcto' ? 'Continuar' : 'Intentar de nuevo'}
           onClick={resultado === 'correcto' ? () => onSiguiente(fallos === 0) : reintentar}
         />
