@@ -31,3 +31,12 @@ export function marcarLeccionCompletada(categoriaId, leccionId) {
     // sin almacenamiento: el avance no se guarda
   }
 }
+
+// Borra todo el avance guardado (se usa en Configuración)
+export function reiniciarProgreso() {
+  try {
+    localStorage.removeItem(CLAVE)
+  } catch {
+    // sin almacenamiento: no hay nada que borrar
+  }
+}

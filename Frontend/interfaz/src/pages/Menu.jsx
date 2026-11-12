@@ -1,25 +1,27 @@
 import Sidebar from '../components/Sidebar'
 import CategoriaCard from '../components/CategoriaCard'
-import {IconCampana } from '../components/Icons'
-import Mascota from '../components/Mascota' // NUEVO
+import { IconCampana } from '../components/Icons'
+import Mascota from '../components/Mascota'
+import { categorias } from '../data/categorias'
+import { cantidadCompletadas } from '../services/progreso'
+import { obtenerNombreSaludo } from '../services/preferencias'
 import '../styles/menu.css'
 
-const categorias = [
-  { titulo: 'Familia', descripcion: 'Aprende los nombres de los miembros de la familia', icono: '👪', color: 'naranja', completadas: 0, total: 15, ruta: '/categoria/familia' },
-  { titulo: 'Colores', descripcion: 'Descubre los colores en náhuatl', icono: '🎨', color: 'morado', completadas: 0, total: 15, ruta: '/categoria/colores' },
-  { titulo: 'Números', descripcion: 'Aprende a contar en náhuatl', icono: '🔢', color: 'azul', completadas: 0, total: 15, ruta: '/categoria/numeros' },
-  { titulo: 'Frases', descripcion: 'Aprende unas frases en náhuatl', icono: '💬', color: 'verde', completadas: 0, total: 15, ruta: '/categoria/frases' },
-]
-
-// "EDGAR BÁEZ SANTAMARÍA" -> "Edgar"
-function obtenerPrimerNombre(nombreCompleto) {
-  const primero = (nombreCompleto || '').trim().split(' ')[0]
-  if (!primero) return 'amigo'
-  return primero.charAt(0).toUpperCase() + primero.slice(1).toLowerCase()
-}
-
 function Menu({ usuario }) {
-  const nombreUsuario = obtenerPrimerNombre(usuario?.nombre_usuario)
+  // El apodo de Configuración, o su primer nombre
+  const nombreUsuario = obtenerNombreSaludo(usuario)
+
+  // Las tarjetas salen de data/categorias.js con el progreso real del usuario
+  const tarjetas = Object.entries(categorias).map(([id, cat]) => ({
+    id,
+    titulo: cat.titulo,
+    descripcion: cat.descripcion,
+    icono: cat.icono,
+    color: cat.color,
+    completadas: Math.min(cantidadCompletadas(id), cat.lecciones.length),
+    total: cat.lecciones.length,
+    ruta: `/categoria/${id}`,
+  }))
 
   return (
     <div className="menu-layout">
@@ -27,7 +29,7 @@ function Menu({ usuario }) {
 
       <main className="menu-contenido">
         <div className="menu-topbar">
-          <button className="icono-boton"><IconCampana /></button>
+          <button className="icono-boton" aria-label="Notificaciones"><IconCampana /></button>
         </div>
 
         <section className="bienvenida-card">
@@ -35,8 +37,6 @@ function Menu({ usuario }) {
             <h2>🍃 ¡Hola, {nombreUsuario}! 🍃</h2>
             <p>Tu esfuerzo hoy, te acerca a grandes logros. Sigue aprendiendo náhuatl.</p>
           </div>
-          {/* NUEVO: la imagen fija quedó comentada (no borrada) */}
-          {/* <img src="/mascota.png" alt="Mascota de Tanextli" className="bienvenida-mascota" /> */}
           <div className="bienvenida-mascota">
             <Mascota rutina="menu" tamano="pequeno" entrada="asomar" />
           </div>
@@ -45,8 +45,8 @@ function Menu({ usuario }) {
         <h3 className="menu-subtitulo">Selecciona una categoría para comenzar</h3>
 
         <div className="categorias-grid">
-          {categorias.map((cat) => (
-            <CategoriaCard key={cat.titulo} {...cat} />
+          {tarjetas.map(({ id, ...cat }) => (
+            <CategoriaCard key={id} {...cat} />
           ))}
         </div>
       </main>
