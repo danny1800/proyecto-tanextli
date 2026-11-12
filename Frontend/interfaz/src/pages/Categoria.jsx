@@ -6,14 +6,15 @@ import { categorias } from '../data/categorias'
 import {
   IconFamilia, IconColores, IconFrases, IconNumeros,
   IconBloqueado, IconCasilla, IconCasillaMarcada,
-  IconColoresVenn, IconNumeroHash,IconMano, IconConversacion, IconCaraTriste,
+  IconColoresVenn, IconNumeroHash, IconMano, IconConversacion, IconCaraTriste,
 } from '../components/Icons'
 import '../styles/categoria.css'
+import { contenidoLecciones } from '../data/lecciones'
 
 const iconosCategoria = {
   familia: IconFamilia,
   colores: IconColoresVenn,
-  frases:  IconFrases,
+  frases: IconFrases,
   numeros: IconNumeroHash,
 }
 
@@ -79,6 +80,10 @@ function Categoria() {
               const completada = index < leccionesCompletadas
               const bloqueada = index > leccionesCompletadas
               const etiqueta = leccion.final ? 'Lección final' : `Lección ${leccion.id}`
+              const cantidad =
+                contenidoLecciones[id] && contenidoLecciones[id][leccion.id]
+                  ? contenidoLecciones[id][leccion.id].palabras.length
+                  : leccion.palabras
 
               return (
                 <button
@@ -92,7 +97,7 @@ function Categoria() {
                     <span className="lec-card-etiqueta">{etiqueta}</span>
                     <span className="lec-card-titulo">{leccion.titulo}</span>
                     {!leccion.final && (
-                      <span className="lec-card-palabras">{leccion.palabras} palabras</span>
+                      <span className="lec-card-palabras">{cantidad} palabras</span>
                     )}
                   </span>
                   <span className="lec-card-estado">

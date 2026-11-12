@@ -45,16 +45,16 @@ const pasos = [
       { icono: '🧭', titulo: 'Barra lateral', texto: 'Desde la izquierda saltas a cualquier categoría, a Acerca de y más.' },
     ],
   },
-  {
+    {
     id: 'tutorial-leccion',
     tipo: 'tutorial',
     estado: 'reposo',
-    mensaje: 'Cada lección tiene cuatro pasos.',
+    mensaje: 'Cada lección empieza practicando y sigue con 3 actividades.',
     items: [
-      { icono: <IconAltavoz />, titulo: 'Escucha', texto: 'Oye la palabra en náhuatl.' },
-      { icono: <IconMicrofono />, titulo: 'Repite', texto: 'Pronúnciala con el micrófono.' },
-      { icono: <IconDocumento />, titulo: 'Actividad 1', texto: 'Elige la respuesta correcta.' },
-      { icono: <IconLapiz />, titulo: 'Actividad 2', texto: 'Escribe la traducción.' },
+      { icono: <IconMicrofono />, titulo: 'Escucha y repite', texto: 'Oye la palabra en náhuatl y repítela con tu voz.' },
+      { icono: <IconAltavoz />, titulo: 'Escucha y elige', texto: 'Escucha la palabra y elige su significado.' },
+      { icono: <IconLapiz />, titulo: 'Escribe', texto: 'Escribe la palabra en náhuatl.' },
+      { icono: <IconDocumento />, titulo: 'Lee y elige', texto: 'Lee la palabra en español y elige cómo se dice en náhuatl.' },
     ],
   },
   {

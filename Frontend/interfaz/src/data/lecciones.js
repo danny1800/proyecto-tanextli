@@ -1,42 +1,40 @@
 const familiaLeccion1 = [
-  { nahuatl: 'Cenchan', espanol: 'Familia', audio: null },
-  { nahuatl: 'Papan', espanol: 'Padre', audio: null },
-  { nahuatl: 'Maman', espanol: 'Madre', audio: null },
-  { nahuatl: 'Noikniuj', espanol: 'Hermano', audio: null },
-  { nahuatl: 'Noikniuj', espanol: 'Hermana', audio: null },
+  { nahuatl: 'Cenchan', espanol: 'Familia', audio: '/audios/familia/familia-principal/familia.m4a' },
+  { nahuatl: 'Papan', espanol: 'Padre', audio: '/audios/familia/familia-principal/padre.m4a' },
+  { nahuatl: 'Maman', espanol: 'Madre', audio: '/audios/familia/familia-principal/madre.m4a' },
+  { nahuatl: 'Noikniuj', espanol: 'Hermano', audio: '/audios/familia/familia-principal/hermano.m4a' },
+  { nahuatl: 'Noikniuj', espanol: 'Hermana', audio: '/audios/familia/familia-principal/hermana.m4a' },
 ]
 
 const familiaLeccion2 = [
-  { nahuatl: 'Tatatsin', espanol: 'Abuelo', audio: null },
-  { nahuatl: 'Nanatsin', espanol: 'Abuela', audio: null },
-  { nahuatl: 'Noikniuj papan', espanol: 'Tío', audio: null },
-  { nahuatl: 'Noikniuj maman', espanol: 'Tía', audio: null },
-  { nahuatl: 'Nomajichniuj', espanol: 'Primo', audio: null },
+  { nahuatl: 'Tatatsin', espanol: 'Abuelo', audio: '/audios/familia/familia-extendida/abuelo.m4a' },
+  { nahuatl: 'Nanatsin', espanol: 'Abuela', audio: '/audios/familia/familia-extendida/abuela.m4a' },
+  { nahuatl: 'Noikniuj papan', espanol: 'Tío', audio: '/audios/familia/familia-extendida/tio.m4a' },
+  { nahuatl: 'Noikniuj maman', espanol: 'Tía', audio: '/audios/familia/familia-extendida/tia.m4a' },
+  { nahuatl: 'Nomajichniuj', espanol: 'Primo', audio: '/audios/familia/familia-extendida/primo.m4a' },
+  { nahuatl: 'Nomajichniuj', espanol: 'Prima', audio: '/audios/familia/familia-extendida/prima.m4a' },
 ]
 
 const familiaLeccion3 = [
-  { nahuatl: 'Nomajichniuj', espanol: 'Prima', audio: null },
-  { nahuatl: 'Noixuiuj', espanol: 'Nieto', audio: null },
-  { nahuatl: 'Noiuiuj', espanol: 'Nieta', audio: null },
-  { nahuatl: 'Nokonemaj', espanol: 'Sobrino', audio: null },
-  { nahuatl: 'Nokonemaj', espanol: 'Sobrina', audio: null },
-  { nahuatl: 'Monnantsin', espanol: 'Suegra', audio: null },
-  { nahuatl: 'Motatsin', espanol: 'Suegro', audio: null },
-  { nahuatl: 'Noikniuj ni cihuat', espanol: 'Cuñada', audio: null },
-  { nahuatl: 'Noikniuj ni tagat', espanol: 'Cuñado', audio: null },
+  { nahuatl: 'Noixuiuj', espanol: 'Nieto', audio: '/audios/familia/mas-familiares/nieto.m4a' },
+  { nahuatl: 'Noiuiuj', espanol: 'Nieta', audio: '/audios/familia/mas-familiares/nieta.m4a' },
+  { nahuatl: 'Nokonemaj', espanol: 'Sobrino', audio: '/audios/familia/mas-familiares/sobrino.m4a' },
+  { nahuatl: 'Nokonemaj', espanol: 'Sobrina', audio: '/audios/familia/mas-familiares/sobrina.m4a' },
+  { nahuatl: 'Monnantsin', espanol: 'Suegra', audio: '/audios/familia/mas-familiares/suegra.m4a' },
+  { nahuatl: 'Motatsin', espanol: 'Suegro', audio: '/audios/familia/mas-familiares/suegro.m4a' },
+  { nahuatl: 'Noikniuj ni cihuat', espanol: 'Cuñada', audio: '/audios/familia/mas-familiares/cunada.m4a' },
+  { nahuatl: 'Noikniuj ni tagat', espanol: 'Cuñado', audio: '/audios/familia/mas-familiares/cunado.m4a' },
 ]
 
 const familiaLeccion4 = [
-  { nahuatl: 'Okichpil', espanol: 'Niño', audio: null },
-  { nahuatl: 'Suapil', espanol: 'Niña', audio: null },
-  { nahuatl: 'Tagat', espanol: 'Señor', audio: null },
-  { nahuatl: 'Cihuatsin', espanol: 'Señora', audio: null },
-  { nahuatl: 'Wuehuet', espanol: 'Hombre', audio: null },
-  { nahuatl: 'Lamat', espanol: 'Mujer', audio: null },
-  { nahuatl: 'Pili', espanol: 'Bebé', audio: null },
-  { nahuatl: 'Vevetsin', espanol: 'Viejo', audio: null },
-  { nahuatl: 'Nanatsin', espanol: 'Vieja', audio: null },
-  { nahuatl: 'Telpoch', espanol: 'Joven', audio: null },
+  { nahuatl: 'Okichpil', espanol: 'Niño', audio: '/audios/familia/personas/nino.m4a' },
+  { nahuatl: 'Suapil', espanol: 'Niña', audio: '/audios/familia/personas/nina.m4a' },
+  { nahuatl: 'Tagat', espanol: 'Señor', audio: '/audios/familia/personas/senor.m4a' },
+  { nahuatl: 'Cihuatsin', espanol: 'Señora', audio: '/audios/familia/personas/senora.m4a' },
+  { nahuatl: 'Wuehuet', espanol: 'Hombre', audio: '/audios/familia/personas/hombre.m4a' },
+  { nahuatl: 'Lamat', espanol: 'Mujer', audio: '/audios/familia/personas/mujer.m4a' },
+  { nahuatl: 'Pili', espanol: 'Bebé', audio: '/audios/familia/personas/bebe.m4a' },
+  { nahuatl: 'Telpoch', espanol: 'Joven', audio: '/audios/familia/personas/joven.m4a' },
 ]
 
 export const contenidoLecciones = {

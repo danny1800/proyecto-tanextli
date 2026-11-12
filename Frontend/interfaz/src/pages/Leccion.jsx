@@ -6,8 +6,7 @@ import { contenidoLecciones } from '../data/lecciones'
 import { marcarLeccionCompletada } from '../services/progreso'
 import { IconAltavoz, IconMicrofono } from '../components/Icons'
 import '../styles/leccion.css'
-
-const ACTIVIDADES_POR_DEFECTO = ['escuchar', 'opcion', 'escritura']
+import { actividadesDe } from '../data/actividades'
 
 // Títulos que aparecen en la barra de resultado (uno al azar)
 const TITULOS_ACIERTO = ['¡Excelente!', '¡Muy bien!', '¡Perfecto!', '¡Bien hecho!']
@@ -53,6 +52,20 @@ function sonar(src) {
   audio.play().catch(() => { })
 }
 
+// Elige 3 opciones equivocadas distintas (que no repitan el texto que va en los botones)
+function elegirDistractores(p, palabras, todasLasPalabras, campo) {
+  const vistos = new Set([p[campo]])
+  const elegidas = []
+  for (const q of [...mezclar(palabras), ...mezclar(todasLasPalabras)]) {
+    if (elegidas.length === 3) break
+    if (q.nahuatl === p.nahuatl) continue // misma palabra en náhuatl: también sería correcta
+    if (vistos.has(q[campo])) continue
+    vistos.add(q[campo])
+    elegidas.push(q)
+  }
+  return elegidas
+}
+
 // Arma la lista de pasos de la lección en el orden que indique "actividades"
 function construirFases(palabras, todasLasPalabras, actividades) {
   const puntuables = actividades.filter((a) => a !== 'escuchar')
@@ -65,18 +78,12 @@ function construirFases(palabras, todasLasPalabras, actividades) {
       palabras.forEach((p) => fases.push({ tipo, palabra: p }))
     } else if (tipo === 'unir') {
       fases.push({ tipo, palabras, numero: numeroDe(tipo), de })
-    } else if (tipo === 'opcion') {
+    } else if (tipo === 'opcion' || tipo === 'escuchaElige' || tipo === 'leeElige') {
+      // Los botones llevan la palabra en español solo en "escuchaElige"
+      const campo = tipo === 'escuchaElige' ? 'espanol' : 'nahuatl'
       palabras.forEach((p) => {
-        const deLaLeccion = palabras.filter((q) => q.nahuatl !== p.nahuatl)
-        const deLaCategoria = todasLasPalabras.filter(
-          (q) => q.nahuatl !== p.nahuatl && !deLaLeccion.some((r) => r.nahuatl === q.nahuatl)
-        )
-        // Sin repetir palabras: Hermano y Hermana se escriben igual (Noikniuj)
-        const vistas = new Set([p.nahuatl])
-        const distractores = [...mezclar(deLaLeccion), ...mezclar(deLaCategoria)]
-          .filter((q) => !vistas.has(q.nahuatl) && vistas.add(q.nahuatl))
-          .slice(0, 3)
-        fases.push({ tipo, palabra: p, opciones: mezclar([p, ...distractores]), numero: numeroDe(tipo), de })
+        const opciones = mezclar([p, ...elegirDistractores(p, palabras, todasLasPalabras, campo)])
+        fases.push({ tipo, palabra: p, opciones, numero: numeroDe(tipo), de })
       })
     } else if (tipo === 'escritura') {
       palabras.forEach((p) => fases.push({ tipo, palabra: p, numero: numeroDe(tipo), de }))
@@ -369,14 +376,25 @@ function PasoUnir({ palabras, numero, de, onSiguiente }) {
 
 /* ---------- Paso: opción múltiple ---------- */
 
-function PasoOpcionMultiple({ palabra, opciones, numero, de, onSiguiente }) {
+// modo 'opcion':       escucha el audio y elige la palabra en náhuatl
+// modo 'escuchaElige': escucha el audio y elige su significado en español
+// modo 'leeElige':     lee la palabra en español y elige cómo se dice en náhuatl
+function PasoOpcionMultiple({ modo, palabra, opciones, numero, de, onSiguiente }) {
   const { reproducir, aviso } = useAudio(palabra.audio)
   const [seleccion, setSeleccion] = useState(null)
   const [resultado, setResultado] = useState(null) // null | correcto | incorrecto
   const [fallos, setFallos] = useState(0)
 
+  const idDe = (op) => `${op.nahuatl}|${op.espanol}`
+  const textoBoton = (op) => (modo === 'escuchaElige' ? op.espanol : op.nahuatl)
+  const pistas = {
+    opcion: 'Escucha el audio y escoge la respuesta correcta',
+    escuchaElige: 'Escucha la palabra y elige su significado en español',
+    leeElige: 'Lee la palabra y elige cómo se dice en náhuatl',
+  }
+
   function comprobar() {
-    const acierto = seleccion === palabra.nahuatl
+    const acierto = seleccion === idDe(palabra)
     if (!acierto) setFallos((f) => f + 1)
     setResultado(acierto ? 'correcto' : 'incorrecto')
   }
@@ -389,28 +407,42 @@ function PasoOpcionMultiple({ palabra, opciones, numero, de, onSiguiente }) {
   return (
     <>
       <h2 className="lp-actividad">Actividad {numero} de {de}</h2>
-      {resultado === null && <MascotaPista pista="Escucha el audio y escoge la respuesta correcta" />}
+      {resultado === null && <MascotaPista pista={pistas[modo]} />}
 
-      <button className="lp-audio" onClick={reproducir} aria-label="Escuchar la palabra">
-        <IconAltavoz />
-      </button>
-      {aviso && <p className="lp-aviso">No se pudo reproducir el audio.</p>}
-      {!palabra.audio && <p className="lp-ayuda">Significa: {palabra.espanol}</p>}
+      {modo === 'leeElige' ? (
+        <div className="lp-tarjeta">
+          <p className="lp-traduccion">Lee la palabra</p>
+          <h2 className="lp-palabra">{palabra.espanol}</h2>
+        </div>
+      ) : (
+        <>
+          <button className="lp-audio" onClick={reproducir} aria-label="Escuchar la palabra">
+            <IconAltavoz />
+          </button>
+          {aviso && <p className="lp-aviso">No se pudo reproducir el audio.</p>}
+          {!palabra.audio && (
+            <p className="lp-ayuda">
+              {modo === 'escuchaElige' ? `Dice: ${palabra.nahuatl}` : `Significa: ${palabra.espanol}`}
+            </p>
+          )}
+        </>
+      )}
 
       <div className="lp-opciones">
         {opciones.map((op) => {
+          const id = idDe(op)
           let clase = 'lp-opcion'
-          if (seleccion === op.nahuatl) {
+          if (seleccion === id) {
             clase += resultado ? (resultado === 'correcto' ? ' correcta' : ' incorrecta') : ' seleccionada'
           }
           return (
             <button
-              key={op.nahuatl}
+              key={id}
               className={clase}
               disabled={resultado !== null}
-              onClick={() => setSeleccion(op.nahuatl)}
+              onClick={() => setSeleccion(id)}
             >
-              {op.nahuatl}
+              {textoBoton(op)}
             </button>
           )
         })}
@@ -584,9 +616,10 @@ function ReproductorLeccion({ categoriaId, leccion, palabras, actividades, onRep
     contenido = <PasoEscuchaRepite palabra={fase.palabra} onContinuar={avanzar} />
   } else if (fase.tipo === 'unir') {
     contenido = <PasoUnir palabras={fase.palabras} numero={fase.numero} de={fase.de} onSiguiente={avanzar} />
-  } else if (fase.tipo === 'opcion') {
+  } else if (fase.tipo === 'opcion' || fase.tipo === 'escuchaElige' || fase.tipo === 'leeElige') {
     contenido = (
       <PasoOpcionMultiple
+        modo={fase.tipo}
         palabra={fase.palabra}
         opciones={fase.opciones}
         numero={fase.numero}
@@ -654,7 +687,7 @@ function Leccion() {
       categoriaId={id}
       leccion={leccion}
       palabras={contenido.palabras}
-      actividades={contenido.actividades || ACTIVIDADES_POR_DEFECTO}
+      actividades={actividadesDe(id, leccion.id, leccion.final)}
       onRepasar={() => setVuelta((v) => v + 1)}
     />
   )

@@ -1,8 +1,16 @@
-import { useParams, useNavigate, Navigate, Link } from 'react-router-dom'
+import { useParams, useNavigate, Link, Navigate } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import { categorias } from '../data/categorias'
-import { IconFlechaAtras, IconAltavoz, IconMicrofono, IconDocumento, IconLapiz } from '../components/Icons'
+import { actividadesDe, INFO_ACTIVIDADES } from '../data/actividades'
+import { IconAltavoz, IconMicrofono, IconDocumento, IconLapiz } from '../components/Icons'
 import '../styles/Catinfo.css'
+
+const ICONOS = {
+  microfono: IconMicrofono,
+  altavoz: IconAltavoz,
+  documento: IconDocumento,
+  lapiz: IconLapiz,
+}
 
 function CategoriaIntro() {
   const { id } = useParams()
@@ -12,6 +20,19 @@ function CategoriaIntro() {
   if (!categoria) {
     return <Navigate to="/menu" replace />
   }
+
+  // Las actividades que tiene cada lección de esta categoría (la de inicio y hasta 3 más)
+  let numero = 0
+  const tarjetas = actividadesDe(id, 1).map((tipo) => {
+    const info = INFO_ACTIVIDADES[tipo]
+    if (tipo !== 'escuchar') numero += 1
+    return {
+      tipo,
+      icono: info.icono,
+      texto: info.texto,
+      titulo: tipo === 'escuchar' ? info.titulo : `Actividad ${numero}: ${info.titulo}`,
+    }
+  })
 
   return (
     <div className="menu-layout">
@@ -27,26 +48,16 @@ function CategoriaIntro() {
         </h1>
 
         <div className="intro-grid">
-          <div className="intro-tarjeta">
-            <IconAltavoz />
-            <h3>Escucha</h3>
-            <p>Escucha la palabra en náhuatl</p>
-          </div>
-          <div className="intro-tarjeta">
-            <IconMicrofono />
-            <h3>Repite</h3>
-            <p>Repite la palabra para tu pronunciación</p>
-          </div>
-          <div className="intro-tarjeta">
-            <IconDocumento />
-            <h3>Actividad 1</h3>
-            <p>Opción múltiple. Elige la respuesta correcta</p>
-          </div>
-          <div className="intro-tarjeta">
-            <IconLapiz />
-            <h3>Actividad 2</h3>
-            <p>Escribe la traducción, pon a prueba lo que aprendiste</p>
-          </div>
+          {tarjetas.map((t) => {
+            const Icono = ICONOS[t.icono]
+            return (
+              <div key={t.tipo} className="intro-tarjeta">
+                <Icono />
+                <h3>{t.titulo}</h3>
+                <p>{t.texto}</p>
+              </div>
+            )
+          })}
         </div>
 
         <button className="intro-continuar" onClick={() => navigate(`/categoria/${id}/lecciones`)}>

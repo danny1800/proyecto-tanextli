@@ -8,9 +8,9 @@ export const categorias = {
     color: 'naranja',
     lecciones: [
       { id: 1, titulo: 'Familia', palabras: 5 },
-      { id: 2, titulo: 'Familia extendida', palabras: 5 },
-      { id: 3, titulo: 'Más familiares', palabras: 9 },
-      { id: 4, titulo: 'Personas', palabras: 10 },
+      { id: 2, titulo: 'Familia extendida', palabras: 6 },
+      { id: 3, titulo: 'Más familiares', palabras: 8 },
+      { id: 4, titulo: 'Personas', palabras: 8 },
       { id: 5, titulo: 'Repaso', final: true },
     ],
   },
