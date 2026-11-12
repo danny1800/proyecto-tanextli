@@ -32,9 +32,9 @@ const fuentes = [
 ]
 
 const funciones = [
-  { Icono: IconAltavoz, titulo: 'Escucha', texto: 'Oye cada palabra en náhuatl' },
-  { Icono: IconMicrofono, titulo: 'Repite', texto: 'Practica tu pronunciación' },
-  { Icono: IconDocumento, titulo: 'Elige', texto: 'Actividades de opción múltiple' },
+  { Icono: IconMicrofono, titulo: 'Escucha y repite', texto: 'Practica tu pronunciación' },
+  { Icono: IconAltavoz, titulo: 'Escucha y elige', texto: 'Elige el significado de lo que oyes' },
+  { Icono: IconDocumento, titulo: 'Lee y elige', texto: 'Elige cómo se dice en náhuatl' },
   { Icono: IconLapiz, titulo: 'Escribe', texto: 'Pon a prueba lo que aprendiste' },
 ]
 

@@ -8,9 +8,9 @@ export const categorias = {
     color: 'naranja',
     lecciones: [
       { id: 1, titulo: 'Familia', palabras: 5 },
-      { id: 2, titulo: 'Familia extendida', palabras: 5 },
-      { id: 3, titulo: 'Más familiares', palabras: 9 },
-      { id: 4, titulo: 'Personas', palabras: 10 },
+      { id: 2, titulo: 'Familia extendida', palabras: 6 },
+      { id: 3, titulo: 'Más familiares', palabras: 8 },
+      { id: 4, titulo: 'Personas', palabras: 8 },
       { id: 5, titulo: 'Repaso', final: true },
     ],
   },
@@ -49,6 +49,20 @@ export const categorias = {
       { id: 2, titulo: 'Parte 2', palabras: 5 },
       { id: 3, titulo: 'Parte 3', palabras: 5 },
       { id: 4, titulo: 'Repaso general', final: true },
+    ],
+  },
+
+    frases: {
+    titulo: 'Frases comunes',
+    descripcion: 'Aprende unas frases en náhuatl',
+    icono: '💬',
+    color: 'verde',
+    lecciones: [
+      { id: 1, titulo: 'Saludos', palabras: 5, icono: 'mano' },
+      { id: 2, titulo: 'Conversación', palabras: 5, icono: 'conversacion' },
+      { id: 3, titulo: 'Expresiones', palabras: 9, icono: 'triste' }, // el diseño dice 9 palabras: confirmar
+      { id: 4, titulo: 'Despedida', palabras: 5, icono: 'mano' },
+      { id: 5, titulo: 'Repaso general', final: true },
     ],
   },
 }
