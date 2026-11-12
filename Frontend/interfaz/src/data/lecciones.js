@@ -37,6 +37,45 @@ const familiaLeccion4 = [
   { nahuatl: 'Telpoch', espanol: 'Joven', audio: '/audios/familia/personas/joven.m4a' },
 ]
 
+// ---------- Números (palabras de Palabras_Tanextl_v2_nahualt.xlsx) ----------
+// AQUÍ VA EL AUDIO: cuando estén grabados, cambien  audio: null  por la ruta.
+// Las rutas acordadas están en contenido.json, por ejemplo:
+//   '/audios/numeros/del-1-5/1.m4a'  (el archivo va en public/audios/numeros/del-1-5/)
+//
+// Aquí sí se usa "unir": cada número se escribe distinto en náhuatl.
+
+const numerosLeccion1 = [
+  { nahuatl: 'Se', espanol: 'Uno', audio: null },
+  { nahuatl: 'Ome', espanol: 'Dos', audio: null },
+  { nahuatl: 'Eyi', espanol: 'Tres', audio: null },
+  { nahuatl: 'Nahui', espanol: 'Cuatro', audio: null },
+  { nahuatl: 'Makuil', espanol: 'Cinco', audio: null },
+]
+
+const numerosLeccion2 = [
+  { nahuatl: 'Chikuase', espanol: 'Seis', audio: null },
+  { nahuatl: 'Chikame', espanol: 'Siete', audio: null },
+  { nahuatl: 'Chikeyi', espanol: 'Ocho', audio: null },
+  { nahuatl: 'Chiknahui', espanol: 'Nueve', audio: null },
+  { nahuatl: 'Mahtlaktli', espanol: 'Diez', audio: null },
+]
+
+const numerosLeccion3 = [
+  { nahuatl: 'Mahtlaktli ihwan se', espanol: 'Once', audio: null },
+  { nahuatl: 'Mahtlaktli ihwan ome', espanol: 'Doce', audio: null },
+  { nahuatl: 'Mahtlaktli ihwan eyi', espanol: 'Trece', audio: null },
+  { nahuatl: 'Mahtlaktli ihwan nahui', espanol: 'Catorce', audio: null },
+  { nahuatl: 'Kaxtolli', espanol: 'Quince', audio: null },
+]
+
+const numerosLeccion4 = [
+  { nahuatl: 'Kaxtolli ihwan se', espanol: 'Dieciséis', audio: null },
+  { nahuatl: 'Kaxtolli ihwan ome', espanol: 'Diecisiete', audio: null },
+  { nahuatl: 'Kaxtolli ihwan eyi', espanol: 'Dieciocho', audio: null },
+  { nahuatl: 'Kaxtolli ihwan nahui', espanol: 'Diecinueve', audio: null },
+  { nahuatl: 'Sempowalli', espanol: 'Veinte', audio: null },
+]
+
 export const contenidoLecciones = {
   familia: {
     1: { palabras: familiaLeccion1 },
@@ -47,6 +86,18 @@ export const contenidoLecciones = {
     5: {
       actividades: ['opcion', 'escritura'],
       palabras: [...familiaLeccion1, ...familiaLeccion2, ...familiaLeccion3, ...familiaLeccion4],
+    },
+  },
+
+  numeros: {
+    1: { actividades: ['escuchar', 'unir', 'opcion', 'escritura'], palabras: numerosLeccion1 },
+    2: { actividades: ['escuchar', 'unir', 'opcion', 'escritura'], palabras: numerosLeccion2 },
+    3: { actividades: ['escuchar', 'unir', 'opcion', 'escritura'], palabras: numerosLeccion3 },
+    4: { actividades: ['escuchar', 'unir', 'opcion', 'escritura'], palabras: numerosLeccion4 },
+    // Lección final: repaso de los 20 números
+    5: {
+      actividades: ['opcion', 'escritura'],
+      palabras: [...numerosLeccion1, ...numerosLeccion2, ...numerosLeccion3, ...numerosLeccion4],
     },
   },
 
