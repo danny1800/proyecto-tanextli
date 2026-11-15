@@ -45,35 +45,35 @@ const familiaLeccion4 = [
 // Aquí sí se usa "unir": cada número se escribe distinto en náhuatl.
 
 const numerosLeccion1 = [
-  { nahuatl: 'Se', espanol: 'Uno', audio: null },
-  { nahuatl: 'Ome', espanol: 'Dos', audio: null },
-  { nahuatl: 'Eyi', espanol: 'Tres', audio: null },
-  { nahuatl: 'Nahui', espanol: 'Cuatro', audio: null },
-  { nahuatl: 'Makuil', espanol: 'Cinco', audio: null },
+  { nahuatl: 'Se', espanol: 'Uno', audio: '/audios/numeros/del-1-5/1.m4a' },
+  { nahuatl: 'Ome', espanol: 'Dos', audio: '/audios/numeros/del-1-5/2.m4a' },
+  { nahuatl: 'Eyi', espanol: 'Tres', audio: '/audios/numeros/del-1-5/3.m4a' },
+  { nahuatl: 'Nahui', espanol: 'Cuatro', audio: '/audios/numeros/del-1-5/4.m4a' },
+  { nahuatl: 'Makuil', espanol: 'Cinco', audio: '/audios/numeros/del-1-5/5.m4a' },
 ]
 
 const numerosLeccion2 = [
-  { nahuatl: 'Chikuase', espanol: 'Seis', audio: null },
-  { nahuatl: 'Chikame', espanol: 'Siete', audio: null },
-  { nahuatl: 'Chikeyi', espanol: 'Ocho', audio: null },
-  { nahuatl: 'Chiknahui', espanol: 'Nueve', audio: null },
-  { nahuatl: 'Mahtlaktli', espanol: 'Diez', audio: null },
+  { nahuatl: 'Chikuase', espanol: 'Seis', audio: '/audios/numeros/del-6-10/6.m4a' },
+  { nahuatl: 'Chikame', espanol: 'Siete', audio: '/audios/numeros/del-6-10/7.m4a' },
+  { nahuatl: 'Chikeyi', espanol: 'Ocho', audio: '/audios/numeros/del-6-10/8.m4a' },
+  { nahuatl: 'Chiknahui', espanol: 'Nueve', audio: '/audios/numeros/del-6-10/9.m4a' },
+  { nahuatl: 'Mahtlaktli', espanol: 'Diez', audio: '/audios/numeros/del-6-10/10.m4a' },
 ]
 
 const numerosLeccion3 = [
-  { nahuatl: 'Mahtlaktli ihwan se', espanol: 'Once', audio: null },
-  { nahuatl: 'Mahtlaktli ihwan ome', espanol: 'Doce', audio: null },
-  { nahuatl: 'Mahtlaktli ihwan eyi', espanol: 'Trece', audio: null },
-  { nahuatl: 'Mahtlaktli ihwan nahui', espanol: 'Catorce', audio: null },
-  { nahuatl: 'Kaxtolli', espanol: 'Quince', audio: null },
+  { nahuatl: 'Mahtlaktli ihwan se', espanol: 'Once', audio: '/audios/numeros/del-11-15/11.m4a' },
+  { nahuatl: 'Mahtlaktli ihwan ome', espanol: 'Doce', audio: '/audios/numeros/del-11-15/12.m4a' },
+  { nahuatl: 'Mahtlaktli ihwan eyi', espanol: 'Trece', audio: '/audios/numeros/del-11-15/13.m4a' },
+  { nahuatl: 'Mahtlaktli ihwan nahui', espanol: 'Catorce', audio: '/audios/numeros/del-11-15/14.m4a' },
+  { nahuatl: 'Kaxtolli', espanol: 'Quince', audio: '/audios/numeros/del-11-15/15.m4a' },
 ]
 
 const numerosLeccion4 = [
-  { nahuatl: 'Kaxtolli ihwan se', espanol: 'Dieciséis', audio: null },
-  { nahuatl: 'Kaxtolli ihwan ome', espanol: 'Diecisiete', audio: null },
-  { nahuatl: 'Kaxtolli ihwan eyi', espanol: 'Dieciocho', audio: null },
-  { nahuatl: 'Kaxtolli ihwan nahui', espanol: 'Diecinueve', audio: null },
-  { nahuatl: 'Sempowalli', espanol: 'Veinte', audio: null },
+  { nahuatl: 'Kaxtolli ihwan se', espanol: 'Dieciséis', audio: '/audios/numeros/del-16-20/16.m4a' },
+  { nahuatl: 'Kaxtolli ihwan ome', espanol: 'Diecisiete', audio: '/audios/numeros/del-16-20/17.m4a' },
+  { nahuatl: 'Kaxtolli ihwan eyi', espanol: 'Dieciocho', audio: '/audios/numeros/del-16-20/18.m4a' },
+  { nahuatl: 'Kaxtolli ihwan nahui', espanol: 'Diecinueve', audio: '/audios/numeros/del-16-20/19.m4a' },
+  { nahuatl: 'Sempowalli', espanol: 'Veinte', audio: '/audios/numeros/del-16-20/20.m4a' },
 ]
 
 export const contenidoLecciones = {
