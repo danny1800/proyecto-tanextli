@@ -38,12 +38,6 @@ const familiaLeccion4 = [
 ]
 
 // ---------- Números (palabras de Palabras_Tanextl_v2_nahualt.xlsx) ----------
-// AQUÍ VA EL AUDIO: cuando estén grabados, cambien  audio: null  por la ruta.
-// Las rutas acordadas están en contenido.json, por ejemplo:
-//   '/audios/numeros/del-1-5/1.m4a'  (el archivo va en public/audios/numeros/del-1-5/)
-//
-// Aquí sí se usa "unir": cada número se escribe distinto en náhuatl.
-
 const numerosLeccion1 = [
   { nahuatl: 'Se', espanol: 'Uno', audio: null },
   { nahuatl: 'Ome', espanol: 'Dos', audio: null },
@@ -127,52 +121,56 @@ export const contenidoLecciones = {
     },
   },
 
-      frases: {
+  frases: {
     // Lección 1: Saludos
     1: {
-      actividades: ['escuchar', 'unir', 'opcion', 'escritura'],
+      actividades: ['escuchar', 'leeElige', 'escritura', 'completa'],
       palabras: [
-        { nahuatl: 'Piali', espanol: 'Hola', audio: null },
-        { nahuatl: 'Kwali Tanecik', espanol: 'Buenos días', audio: null },
-        { nahuatl: 'Kwali Tiotaki', espanol: 'Buenas tardes', audio: null },
-        { nahuatl: 'Kwali Tapoyaui', espanol: 'Buenas noches', audio: null },
-        { nahuatl: 'Tlasohkamatik', espanol: 'Gracias', audio: null },
+        { nahuatl: 'Piali', espanol: 'Hola', audio: '/audios/frases-comunes/saludos/hola.m4a' },
+        { nahuatl: 'Kwali Tanecik', espanol: 'Buenos días', audio: '/audios/frases-comunes/saludos/buenos-dias.m4a' },
+        { nahuatl: 'Kwali Tiotaki', espanol: 'Buenas tardes', audio: '/audios/frases-comunes/saludos/buenas-tardes.m4a' },
+        { nahuatl: 'Kwali Tapoyaui', espanol: 'Buenas noches', audio: '/audios/frases-comunes/saludos/buenas-noches.m4a' },
+        { nahuatl: 'Niejokia', espanol: '¡Ya llegué!', audio: '/audios/frases-comunes/saludos/ya-llegue.m4a' },
       ],
     },
     // Lección 2: Conversación
     2: {
       actividades: ['escuchar', 'unir', 'opcion', 'escritura'],
       palabras: [
-        { nahuatl: '¿Keni motokay?', espanol: '¿Cómo te llamas?', audio: null },
-        { nahuatl: '¿Keni tietok?', espanol: '¿Cómo estás?', audio: null },
-        { nahuatl: '¿Kani tiwala?', espanol: '¿De dónde eres?', audio: null },
-        { nahuatl: 'Amo tlen', espanol: 'De nada', audio: null },
-        { nahuatl: 'Kwali nica nietok', espanol: 'Estoy bien', audio: null },
-        { nahuatl: '¿Toni tikneki?', espanol: '¿Qué necesitas?', audio: null },
+        { nahuatl: '¿Keni motokay?', espanol: '¿Cómo te llamas?', audio: '/audios/frases-comunes/conversacion/como-te-llamas.m4a' },
+        { nahuatl: 'Notokay', espanol: 'Mi nombre es', audio: '/audios/frases-comunes/conversacion/mi-nombre-es.m4a' },
+        { nahuatl: 'Packi noyolo', espanol: 'Mucho gusto', audio: '/audios/frases-comunes/conversacion/mucho-gusto.m4a' },
+        { nahuatl: '¿Keni tietok?', espanol: '¿Cómo estás?', audio: '/audios/frases-comunes/conversacion/como-estas.m4a' },
+        { nahuatl: 'Kwali nica nietok', espanol: 'Estoy bien', audio: '/audios/frases-comunes/conversacion/estoy-bien.m4a' },
+        { nahuatl: '¿Kani tiwala?', espanol: '¿De dónde eres?', audio: '/audios/frases-comunes/conversacion/de-donde-eres.m4a' },
+        { nahuatl: '¿Toni tikneki?', espanol: '¿Qué necesitas?', audio: '/audios/frases-comunes/conversacion/que-necesitas.m4a' },
       ],
     },
-    
     // Lección 3: Expresiones
-   /* 3: {
+    3: {
       actividades: ['escuchar', 'unir', 'opcion', 'escritura'],
       palabras: [
-        { nahuatl: 'Ma kwali tonal tikpia', espanol: 'Que tengas un buen día', audio: null },
-        { nahuatl: 'Ma kwali tioj', espanol: 'Que te vaya bien', audio: null },
-        { nahuatl: 'Ixmopiali miak', espanol: 'Cuídate mucho', audio: null },
-        { nahuatl: 'Ma tiyo Isewi', espanol: 'Que descanses', audio: null },
-        { nahuatl: 'Ma tiakan', espanol: 'Hasta Luego', audio: null },
+        { nahuatl: 'Tlasohkamatik', espanol: 'Gracias', audio: '/audios/frases-comunes/expresiones/gracias.m4a' },
+        { nahuatl: 'Amo tlen', espanol: 'De nada', audio: '/audios/frases-comunes/expresiones/de-nada.m4a' },
+        { nahuatl: 'Kema', espanol: 'Sí', audio: '/audios/frases-comunes/expresiones/si.m4a' },
+        { nahuatl: 'Amo', espanol: 'No', audio: '/audios/frases-comunes/expresiones/no.m4a' },
+        { nahuatl: 'Kema nik kuelita', espanol: 'Sí me gusta', audio: '/audios/frases-comunes/expresiones/si-me-gusta.m4a' },
+        { nahuatl: 'Amo ni kuelita', espanol: 'No me gusta', audio: '/audios/frases-comunes/expresiones/no-me-gusta.m4a' },
+        { nahuatl: 'Kema nik mati', espanol: 'Sí sé', audio: '/audios/frases-comunes/expresiones/si-se.m4a' },
+        { nahuatl: 'Amo nik mati', espanol: 'No sé', audio: '/audios/frases-comunes/expresiones/no-se.m4a' },
+        { nahuatl: 'Nimitztlazohtla', espanol: 'Te quiero', audio: '/audios/frases-comunes/expresiones/te-quiero.m4a' },
+        { nahuatl: 'Nimayana', espanol: 'Tengo hambre', audio: '/audios/frases-comunes/expresiones/tengo-hambre.m4a' },
       ],
-    },*/
-
+    },
     // Lección 4: Despedida
     4: {
-      actividades: ['escuchar', 'unir', 'opcion', 'escritura'],
+      actividades: ['escuchar', 'leeElige', 'escritura', 'completa'],
       palabras: [
-        { nahuatl: 'Ma kwali tonal tikpia', espanol: 'Que tengas un buen día', audio: null },
-        { nahuatl: 'Ma kwali tioj', espanol: 'Que te vaya bien', audio: null },
-        { nahuatl: 'Ixmopiali miak', espanol: 'Cuídate mucho', audio: null },
-        { nahuatl: 'Ma tiyo Isewi', espanol: 'Que descanses', audio: null },
-        { nahuatl: 'Ma tiakan', espanol: 'Hasta Luego', audio: null },
+        { nahuatl: 'Ma kwali tonal tikpia', espanol: 'Que tengas un buen día', audio: '/audios/frases-comunes/despedida/que-tengas-un-buen-dia.m4a' },
+        { nahuatl: 'Ma kwali tioj', espanol: 'Que te vaya bien', audio: '/audios/frases-comunes/despedida/que-te-vaya-bien.m4a' },
+        { nahuatl: 'Ixmopiali miak', espanol: 'Cuídate mucho', audio: '/audios/frases-comunes/despedida/cuidate-mucho.m4a' },
+        { nahuatl: 'Ma tiyo Isewi', espanol: 'Que descanses', audio: '/audios/frases-comunes/despedida/que-descanses.m4a' },
+        { nahuatl: 'Ma tiakan', espanol: 'Hasta luego', audio: '/audios/frases-comunes/despedida/hasta-luego.m4a' },
       ],
     },
   },

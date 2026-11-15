@@ -3,6 +3,8 @@ import CategoriaCard from '../components/CategoriaCard'
 import {IconCampana } from '../components/Icons'
 import Mascota from '../components/Mascota' // NUEVO
 import '../styles/menu.css'
+import { categorias as categoriasDatos } from '../data/categorias'
+import { cantidadCompletadas } from '../services/progreso'
 
 const categorias = [
   { titulo: 'Familia', descripcion: 'Aprende los nombres de los miembros de la familia', icono: '👪', color: 'naranja', completadas: 0, total: 15, ruta: '/categoria/familia' },
@@ -11,7 +13,6 @@ const categorias = [
   { titulo: 'Frases', descripcion: 'Aprende unas frases en náhuatl', icono: '💬', color: 'verde', completadas: 0, total: 15, ruta: '/categoria/frases' },
 ]
 
-// "EDGAR BÁEZ SANTAMARÍA" -> "Edgar"
 function obtenerPrimerNombre(nombreCompleto) {
   const primero = (nombreCompleto || '').trim().split(' ')[0]
   if (!primero) return 'amigo'
@@ -20,6 +21,15 @@ function obtenerPrimerNombre(nombreCompleto) {
 
 function Menu({ usuario }) {
   const nombreUsuario = obtenerPrimerNombre(usuario?.nombre_usuario)
+    // El avance real de cada categoría, leído de lo que ya completaste
+  const categoriasConAvance = categorias.map((c) => {
+    const id = c.ruta.split('/').pop()
+    return {
+      ...c,
+      completadas: cantidadCompletadas(id),
+      total: categoriasDatos[id].lecciones.length,
+    }
+  })
 
   return (
     <div className="menu-layout">
@@ -45,7 +55,7 @@ function Menu({ usuario }) {
         <h3 className="menu-subtitulo">Selecciona una categoría para comenzar</h3>
 
         <div className="categorias-grid">
-          {categorias.map((cat) => (
+          {categoriasConAvance.map((cat) => (
             <CategoriaCard key={cat.titulo} {...cat} />
           ))}
         </div>
