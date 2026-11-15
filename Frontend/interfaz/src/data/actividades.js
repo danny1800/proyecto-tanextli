@@ -16,6 +16,11 @@ import { contenidoLecciones } from './lecciones'
 
 // Texto y ícono de cada actividad (se usa en la pantalla "¿Qué hay en cada lección?")
 export const INFO_ACTIVIDADES = {
+    unirNumero: {
+    titulo: 'Une el número',
+    texto: 'Une cada número con su nombre en náhuatl',
+    icono: 'documento',
+  },
   escuchar: {
     titulo: 'Escucha y repite',
     texto: 'Escucha la palabra en náhuatl y repítela con tu voz',
@@ -51,7 +56,7 @@ export const INFO_ACTIVIDADES = {
 // Actividades por categoría: todas sus lecciones (menos el repaso final) usan las mismas.
 // Las categorías que no estén aquí usan lo que diga cada lección en lecciones.js.
 export const ACTIVIDADES_POR_CATEGORIA = {
-  familia: ['escuchar', 'escuchaElige', 'escritura', 'leeElige'],
+    numeros: ['escuchar', 'unirNumero', 'opcion', 'escritura'],
 }
 
 export const ACTIVIDADES_POR_DEFECTO = ['escuchar', 'opcion', 'escritura']
