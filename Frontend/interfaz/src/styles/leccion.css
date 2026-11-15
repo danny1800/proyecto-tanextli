@@ -589,3 +589,60 @@
   height: 56px;
   object-fit: contain;
 }
+
+/* ---------- Completa la frase ---------- */
+.lp-frase {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 8px 10px;
+  font-size: 24px;
+  font-weight: 800;
+  color: #1b4332;
+}
+
+.lp-hueco {
+  min-width: 90px;
+  padding: 4px 12px;
+  border: none;
+  border-bottom: 3px solid #9aa89f;
+  border-radius: 6px 6px 0 0;
+  background: #f3f7f4;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 800;
+  color: #1b4332;
+  cursor: pointer;
+}
+.lp-hueco:disabled { cursor: default; }
+.lp-hueco.lleno { background: #e1f5e7; border-bottom-color: #2d6a4f; }
+.lp-hueco.correcta { background: #cdeed4; border-bottom-color: #2d6a4f; }
+.lp-hueco.incorrecta { background: #fdecec; border-bottom-color: #b3261e; color: #b3261e; }
+
+.lp-fichas {
+  width: 100%;
+  max-width: 460px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.lp-ficha {
+  padding: 12px 20px;
+  border: 2px solid #cfd6d2;
+  border-bottom-width: 4px;
+  border-radius: 14px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 800;
+  color: #1b4332;
+  cursor: pointer;
+}
+.lp-ficha:hover:not(:disabled) { border-color: #2d6a4f; }
+.lp-ficha:disabled { cursor: default; }
+.lp-ficha.usada { background: #eef2ef; color: transparent; border-color: #e0e6e2; }
+.lp-ficha:disabled:not(.usada) { opacity: 0.6; }

@@ -52,6 +52,53 @@ function sonar(src) {
   audio.play().catch(() => { })
 }
 
+// Separa una frase en palabras, dejando aparte los signos (¿ ? ¡ ! , .) para que no den pistas
+function palabrasDeFrase(frase) {
+  return frase
+    .trim()
+    .split(/\s+/)
+    .map((token) => {
+      const m = token.match(/^([¿¡"“(]*)(.*?)([?!.,;:"”)]*)$/)
+      return { antes: m[1], texto: m[2], despues: m[3] }
+    })
+}
+
+// Prepara una pregunta de "completa la frase": tapa una palabra y busca 3 opciones equivocadas
+function armarHueco(p, palabras, todasLasPalabras) {
+  const partes = palabrasDeFrase(p.nahuatl)
+  const clave = (t) => normalizar(t)
+
+  // Cuántas frases de la lección usan cada palabra: se tapa la que menos se repite
+  const frecuencia = {}
+  palabras.forEach((q) => {
+    new Set(palabrasDeFrase(q.nahuatl).map((x) => clave(x.texto))).forEach((k) => {
+      frecuencia[k] = (frecuencia[k] || 0) + 1
+    })
+  })
+  const candidatos = partes.map((x, i) => i).filter((i) => partes[i].texto)
+  const minimo = Math.min(...candidatos.map((i) => frecuencia[clave(partes[i].texto)] || 1))
+  const posibles = candidatos.filter((i) => (frecuencia[clave(partes[i].texto)] || 1) === minimo)
+  const hueco = posibles[Math.floor(Math.random() * posibles.length)]
+  const correcta = partes[hueco].texto
+
+  // Opciones equivocadas: palabras de otras frases que no aparezcan en esta
+  const enLaFrase = new Set(partes.map((x) => clave(x.texto)))
+  const vistos = new Set()
+  const distractores = []
+  for (const q of [...mezclar(palabras), ...mezclar(todasLasPalabras)]) {
+    if (q.nahuatl.startsWith('(falta)')) continue
+    for (const x of mezclar(palabrasDeFrase(q.nahuatl))) {
+      const k = clave(x.texto)
+      if (!x.texto || enLaFrase.has(k) || vistos.has(k)) continue
+      vistos.add(k)
+      distractores.push(x.texto)
+      break // una palabra por frase, para que haya variedad
+    }
+    if (distractores.length === 3) break
+  }
+  return { partes, hueco, opciones: mezclar([correcta, ...distractores]) }
+}
+
 // Elige 3 opciones equivocadas distintas (que no repitan el texto que va en los botones)
 // Los números en español, del 1 al 20, para saber qué número es cada palabra
 const NUMEROS_EN_ESPANOL = [
@@ -99,6 +146,16 @@ function construirFases(palabras, todasLasPalabras, actividades) {
         const opciones = mezclar([p, ...elegirDistractores(p, palabras, todasLasPalabras, campo)])
         fases.push({ tipo, palabra: p, opciones, numero: numeroDe(tipo), de })
       })
+    } else if (tipo === 'completa') {
+      // Solo frases con 2 o más palabras (y que ya tengan su náhuatl)
+      palabras
+        .filter((p) => !p.nahuatl.startsWith('(falta)') && palabrasDeFrase(p.nahuatl).filter((x) => x.texto).length >= 2)
+        .forEach((p) => {
+          const hueco = armarHueco(p, palabras, todasLasPalabras)
+          if (hueco.opciones.length >= 3) {
+            fases.push({ tipo, palabra: p, ...hueco, numero: numeroDe(tipo), de })
+          }
+        })
     } else if (tipo === 'escritura') {
       palabras.forEach((p) => fases.push({ tipo, palabra: p, numero: numeroDe(tipo), de }))
     }
@@ -548,6 +605,81 @@ function PasoOpcionMultiple({ modo, palabra, opciones, numero, de, onSiguiente }
   )
 }
 
+/* ---------- Paso: completa la frase ---------- */
+
+function PasoCompleta({ palabra, partes, hueco, opciones, numero, de, onSiguiente }) {
+  const [seleccion, setSeleccion] = useState(null)
+  const [resultado, setResultado] = useState(null) // null | correcto | incorrecto
+  const [fallos, setFallos] = useState(0)
+  const correcta = partes[hueco].texto
+
+  function comprobar() {
+    const acierto = seleccion === correcta
+    if (!acierto) setFallos((f) => f + 1)
+    setResultado(acierto ? 'correcto' : 'incorrecto')
+  }
+
+  function reintentar() {
+    setSeleccion(null)
+    setResultado(null)
+  }
+
+  return (
+    <>
+      <h2 className="lp-actividad">Actividad {numero} de {de}</h2>
+      <p className="lp-instruccion">Completa la frase</p>
+      {resultado === null && <MascotaPista pista="Elige la palabra que falta" />}
+
+      <div className="lp-tarjeta">
+        <p className="lp-traduccion">{palabra.espanol}</p>
+        <p className="lp-frase">
+          {partes.map((parte, i) => (
+            <span key={i} className="lp-token">
+              {parte.antes}
+              {i === hueco ? (
+                <button
+                  className={`lp-hueco ${seleccion ? 'lleno' : ''} ${resultado === 'correcto' ? 'correcta' : resultado === 'incorrecto' ? 'incorrecta' : ''}`}
+                  disabled={!seleccion || resultado !== null}
+                  onClick={() => setSeleccion(null)}
+                  aria-label="Espacio en blanco"
+                >
+                  {seleccion || '\u00A0'}
+                </button>
+              ) : (
+                parte.texto
+              )}
+              {parte.despues}
+            </span>
+          ))}
+        </p>
+      </div>
+
+      <div className="lp-fichas">
+        {opciones.map((op) => (
+          <button
+            key={op}
+            className={`lp-ficha ${seleccion === op ? 'usada' : ''}`}
+            disabled={resultado !== null || seleccion === op}
+            onClick={() => setSeleccion(op)}
+          >
+            {op}
+          </button>
+        ))}
+      </div>
+
+      {resultado === null ? (
+        <button className="lp-boton" onClick={comprobar} disabled={!seleccion}>Comprobar</button>
+      ) : (
+        <BarraResultado
+          resultado={resultado}
+          textoBoton={resultado === 'correcto' ? 'Continuar' : 'Intentar de nuevo'}
+          onClick={resultado === 'correcto' ? () => onSiguiente(fallos === 0) : reintentar}
+        />
+      )}
+    </>
+  )
+}
+
 /* ---------- Paso: escritura ---------- */
 
 // Después de cuántos errores aparece la ayuda para recordar cómo se escribe
@@ -716,6 +848,18 @@ function ReproductorLeccion({ categoriaId, leccion, palabras, actividades, onRep
       <PasoOpcionMultiple
         modo={fase.tipo}
         palabra={fase.palabra}
+        opciones={fase.opciones}
+        numero={fase.numero}
+        de={fase.de}
+        onSiguiente={avanzar}
+      />
+    )
+  } else if (fase.tipo === 'completa') {
+    contenido = (
+      <PasoCompleta
+        palabra={fase.palabra}
+        partes={fase.partes}
+        hueco={fase.hueco}
         opciones={fase.opciones}
         numero={fase.numero}
         de={fase.de}

@@ -52,15 +52,15 @@ export const categorias = {
     ],
   },
 
-    frases: {
+  frases: {
     titulo: 'Frases comunes',
     descripcion: 'Aprende unas frases en náhuatl',
     icono: '💬',
     color: 'verde',
     lecciones: [
       { id: 1, titulo: 'Saludos', palabras: 5, icono: 'mano' },
-      { id: 2, titulo: 'Conversación', palabras: 5, icono: 'conversacion' },
-      { id: 3, titulo: 'Expresiones', palabras: 9, icono: 'triste' }, // el diseño dice 9 palabras: confirmar
+      { id: 2, titulo: 'Conversación', palabras: 7, icono: 'conversacion' },
+      { id: 3, titulo: 'Expresiones', palabras: 10, icono: 'triste' },
       { id: 4, titulo: 'Despedida', palabras: 5, icono: 'mano' },
       { id: 5, titulo: 'Repaso general', final: true },
     ],

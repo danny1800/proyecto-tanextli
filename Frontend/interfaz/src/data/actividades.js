@@ -46,6 +46,11 @@ export const INFO_ACTIVIDADES = {
     texto: 'Une cada palabra con su pareja',
     icono: 'documento',
   },
+  completa: {
+    titulo: 'Completa la frase',
+    texto: 'Elige la palabra que falta para completar la frase',
+    icono: 'lapiz',
+  },
   opcion: {
     titulo: 'Escucha y elige',
     texto: 'Escucha la palabra y elige cómo se escribe en náhuatl',
