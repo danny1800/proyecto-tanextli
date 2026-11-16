@@ -685,3 +685,48 @@
 @media (prefers-reduced-motion: reduce) {
   .mxa *, .mxa { animation: none !important; transition: none !important; }
 }
+/* ===== v6: menos saltos y sin giro plano ===== */
+@keyframes saltar {            /* celebrando: antes subía 44, ahora 18 */
+  0%   { transform: translateY(0) scale(1, 1); }
+  15%  { transform: translateY(0) scale(1.04, .95); }
+  40%  { transform: translateY(calc(var(--u) * -16)) scale(.98, 1.03) rotate(-2deg); }
+  60%  { transform: translateY(calc(var(--u) * -18)) scale(.98, 1.02) rotate(2deg); }
+  85%  { transform: translateY(0) scale(1.03, .96); }
+  100% { transform: translateY(0) scale(1, 1); }
+}
+@keyframes pirueta {           /* ya no voltea la imagen: se contonea inclinándose */
+  0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1, 1); }
+  15% { transform: translate(calc(var(--u) * -6), calc(var(--u) * -5)) rotate(-7deg) scale(1.02, .98); }
+  30% { transform: translate(calc(var(--u) * 6),  calc(var(--u) * -2)) rotate(7deg)  scale(1.02, .98); }
+  45% { transform: translate(calc(var(--u) * -6), calc(var(--u) * -5)) rotate(-7deg) scale(1.02, .98); }
+  60% { transform: translate(calc(var(--u) * 6),  calc(var(--u) * -2)) rotate(7deg)  scale(1.02, .98); }
+  75% { transform: translate(0, 0) rotate(0deg) scale(1.03, .96); }
+}
+@keyframes brinco {            /* sorprendida: de 16 a 8 */
+  0%   { transform: translateY(0) scale(1, 1); }
+  30%  { transform: translateY(calc(var(--u) * -8)) scale(.98, 1.03); }
+  55%  { transform: translateY(0) scale(1.03, .96); }
+  75%  { transform: translateY(calc(var(--u) * -2)) scale(1, 1); }
+  100% { transform: translateY(0) scale(1, 1); }
+}
+@keyframes rebote {            /* emocionada: de 18 a 8 */
+  0%, 100% { transform: translate(0, 0) scale(1, 1); }
+  20%  { transform: translate(0, 0) scale(1.04, .95); }
+  50%  { transform: translate(0, calc(var(--u) * -8)) scale(.98, 1.03); }
+  80%  { transform: translate(0, 0) scale(1.03, .96); }
+}
+@keyframes bailar {            /* bailando: de 8 a 3 arriba y abajo */
+  0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1, 1); }
+  12%  { transform: translate(calc(var(--u) * -8), 0) rotate(-4deg) scale(1.03, .97); }
+  25%  { transform: translate(calc(var(--u) * -10), calc(var(--u) * -3)) rotate(-5deg) scale(.99, 1.03); }
+  50%  { transform: translate(0, 0) rotate(0deg) scale(1.03, .97); }
+  62%  { transform: translate(calc(var(--u) * 8), 0) rotate(4deg) scale(1.03, .97); }
+  75%  { transform: translate(calc(var(--u) * 10), calc(var(--u) * -3)) rotate(5deg) scale(.99, 1.03); }
+}
+@keyframes entrada-rebote {    /* al abrir la pantalla: cae de -90 a -40 y rebota menos */
+  0%   { opacity: 0; transform: translateY(calc(var(--u) * -40)) scale(1, 1); }
+  45%  { opacity: 1; transform: translateY(0) scale(1.05, .93); }
+  65%  { transform: translateY(calc(var(--u) * -7)) scale(.98, 1.03); }
+  82%  { transform: translateY(0) scale(1.02, .98); }
+  100% { opacity: 1; transform: translateY(0) scale(1, 1); }
+}

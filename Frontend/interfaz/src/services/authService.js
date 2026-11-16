@@ -23,6 +23,7 @@ async function pedir(endpoint, { method = "GET", body, token } = {}) {
   error.status = response.status;   // NUEVO
   throw error;
 }
+return data;
 }
 
 function guardarSesion(data) {

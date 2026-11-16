@@ -52,7 +52,7 @@ function Perfil({ usuario }) {
           <div className="pf-mascota">
             <p className="pf-globo">{mensajeDeLobita(resumen.porcentaje)}</p>
             <div className="pf-mascota-imagen">
-              <Mascota rutina="menu" tamano="pequeno" />
+             <Mascota rutina="perfil" tamano="pequeno" entrada="deslizar" />
             </div>
           </div>
         </section>
