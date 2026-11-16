@@ -11,6 +11,13 @@ import NoEncontrada from './pages/NoEncontrada'
 import Onboarding from './pages/Onboarding'
 import { onboardingPendiente, marcarOnboardingCompletado } from './services/onboarding'
 import Leccion from './pages/Leccion'
+import Perfil from './pages/Perfil'
+import Configuracion from './pages/Configuracion'
+import { aplicarPreferencias } from './services/preferencias'
+import './styles/preferencias.css'
+
+// Aplica la letra grande / animaciones guardadas desde que abre la app
+aplicarPreferencias()
 
 function App() {
   const [usuario, setUsuario] = useState(null)
@@ -30,16 +37,17 @@ function App() {
 
   // Sin sesión: cualquier ruta (/menu, /categoria/...) muestra el login
   if (!usuario) return <AuthScreen onLogin={setUsuario} />
+
   if (onboardingPendiente(usuario)) {
-  return (
-    <Onboarding
-      onTerminar={() => {
-        marcarOnboardingCompletado(usuario)
-        setBienvenidaVista((n) => n + 1)
-      }}
-    />
-  )
-}
+    return (
+      <Onboarding
+        onTerminar={() => {
+          marcarOnboardingCompletado(usuario)
+          setBienvenidaVista((n) => n + 1)
+        }}
+      />
+    )
+  }
 
   return (
     <Routes>
@@ -47,11 +55,12 @@ function App() {
       <Route path="/menu" element={<Menu usuario={usuario} />} />
       <Route path="/categoria/:id" element={<CategoriaIntro />} />
       <Route path="/categoria/:id/lecciones" element={<Categoria />} />
+      <Route path="/categoria/:id/leccion/:leccionId" element={<Leccion />} />
+      <Route path="/perfil" element={<Perfil usuario={usuario} />} />
+      <Route path="/configuracion" element={<Configuracion usuario={usuario} />} />
       <Route path="/acerca-de" element={<AcercaDe />} />
       <Route path="/bienvenida" element={<Onboarding onTerminar={() => navigate('/menu')} />} />
-      <Route path="/categoria/:id/leccion/:leccionId" element={<Leccion />} />
-      {/* Rutas que todavía no existen (perfil, configuración...) regresan al menú */}
-      <Route path="*" element={<Navigate to="/menu" replace />} />
+      {/* Cualquier otra dirección muestra la página de "no encontrada" */}
       <Route path="*" element={<NoEncontrada />} />
     </Routes>
   )

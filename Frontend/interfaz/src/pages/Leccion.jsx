@@ -101,6 +101,20 @@ function armarHueco(p, palabras, todasLasPalabras, campo = 'nahuatl') {
 }
 
 // Elige 3 opciones equivocadas distintas (que no repitan el texto que va en los botones)
+// Los números en español, del 1 al 20, para saber qué número es cada palabra
+const NUMEROS_EN_ESPANOL = [
+  'uno', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve', 'diez',
+  'once', 'doce', 'trece', 'catorce', 'quince', 'dieciseis', 'diecisiete', 'dieciocho',
+  'diecinueve', 'veinte',
+]
+
+// Devuelve el número (1 a 20) de una palabra, o null si no es un número.
+// Si la palabra trae el campo "numero" en lecciones.js, se usa ese.
+function numeralDe(palabra) {
+  if (palabra.numero) return palabra.numero
+  const i = NUMEROS_EN_ESPANOL.indexOf(normalizar(palabra.espanol))
+  return i === -1 ? null : i + 1
+}
 function elegirDistractores(p, palabras, todasLasPalabras, campo) {
   const vistos = new Set([p[campo]])
   const elegidas = []
@@ -125,7 +139,7 @@ function construirFases(palabras, todasLasPalabras, actividades) {
   actividades.forEach((tipo) => {
     if (tipo === 'escuchar') {
       palabras.forEach((p) => fases.push({ tipo, palabra: p }))
-    } else if (tipo === 'unir') {
+    } else if (tipo === 'unir' || tipo === 'unirNumero') {
       fases.push({ tipo, palabras, numero: numeroDe(tipo), de })
     } else if (tipo === 'opcion' || tipo === 'escuchaElige' || tipo === 'leeElige') {
       // Los botones llevan la palabra en español solo en "escuchaElige"
@@ -251,17 +265,23 @@ function BarraResultado({ resultado, detalle, textoBoton, onClick }) {
 
 function PasoEscuchaRepite({ palabra, onContinuar }) {
   const { reproducir, aviso } = useAudio(palabra.audio)
-  const [grabacion, setGrabacion] = useState('inactiva') // inactiva | grabando | lista | error
+  // inactiva | grabando | lista | error | permitido
+  const [grabacion, setGrabacion] = useState('inactiva')
+  const [modoToque, setModoToque] = useState(false) // true si el usuario tocó en vez de mantener presionado
   const grabadorRef = useRef(null)
-  const mantenidoRef = useRef(false)
+  const quiereGrabarRef = useRef(false) // el usuario quiere que se esté grabando
+  const modoToqueRef = useRef(false)
+  const inicioPulsoRef = useRef(0)
 
-  async function empezar() {
-    mantenidoRef.current = true
+  async function iniciar() {
+    quiereGrabarRef.current = true
+    const antes = Date.now()
     try {
       const flujo = await navigator.mediaDevices.getUserMedia({ audio: true })
-      // Si el usuario soltó el botón mientras el navegador pedía permiso, no grabamos
-      if (!mantenidoRef.current) {
+      // El usuario ya soltó el botón mientras el navegador pedía el permiso
+      if (!quiereGrabarRef.current) {
         flujo.getTracks().forEach((t) => t.stop())
+        if (Date.now() - antes > 600) setGrabacion('permitido') // acaba de dar el permiso
         return
       }
       const grabador = new MediaRecorder(flujo)
@@ -273,18 +293,46 @@ function PasoEscuchaRepite({ palabra, onContinuar }) {
       grabadorRef.current = grabador
       setGrabacion('grabando')
     } catch {
+      quiereGrabarRef.current = false
       setGrabacion('error')
     }
   }
 
-  function detener() {
-    mantenidoRef.current = false
+  function terminar() {
+    quiereGrabarRef.current = false
+    modoToqueRef.current = false
+    setModoToque(false)
     const grabador = grabadorRef.current
     if (grabador && grabador.state === 'recording') grabador.stop()
   }
 
+  function alPresionar(e) {
+    // Mantiene el seguimiento del cursor aunque se salga del botón
+    if (e.currentTarget.setPointerCapture) e.currentTarget.setPointerCapture(e.pointerId)
+    const grabando = grabadorRef.current && grabadorRef.current.state === 'recording'
+    // Si ya está grabando (porque tocó antes), este toque termina la grabación
+    if (modoToqueRef.current || grabando) {
+      terminar()
+      return
+    }
+    inicioPulsoRef.current = Date.now()
+    iniciar()
+  }
+
+  function alSoltar() {
+    if (!quiereGrabarRef.current || modoToqueRef.current) return
+    if (Date.now() - inicioPulsoRef.current < 400) {
+      // Fue un toque corto: sigue grabando hasta que vuelva a tocar el micrófono
+      modoToqueRef.current = true
+      setModoToque(true)
+    } else {
+      terminar()
+    }
+  }
+
   useEffect(() => {
     return () => {
+      quiereGrabarRef.current = false
       const grabador = grabadorRef.current
       if (grabador && grabador.state === 'recording') grabador.stop()
     }
@@ -295,15 +343,21 @@ function PasoEscuchaRepite({ palabra, onContinuar }) {
   if (grabacion === 'lista') {
     estado = 'feliz'
     mensaje = '¡Muy bien! Ya practicaste esta palabra.'
+  } else if (grabacion === 'permitido') {
+    estado = 'feliz'
+    mensaje = '¡Listo! Ya puedes usar el micrófono. Inténtalo otra vez.'
   } else if (grabacion === 'error') {
     estado = 'animo'
     mensaje = 'No pude usar el micrófono. Revisa el permiso del navegador.'
   }
 
   const textoMic = {
-    inactiva: 'Mantén presionado y repite',
-    grabando: 'Grabando... suelta cuando termines',
+    inactiva: 'Mantén presionado y repite (o toca para empezar y toca para terminar)',
+    grabando: modoToque
+      ? 'Grabando... toca de nuevo para terminar'
+      : 'Grabando... suelta o toca de nuevo para terminar',
     lista: 'Listo. Puedes grabar otra vez o continuar.',
+    permitido: 'Micrófono permitido. Mantén presionado y repite.',
     error: 'No se pudo usar el micrófono',
   }[grabacion]
 
@@ -326,20 +380,24 @@ function PasoEscuchaRepite({ palabra, onContinuar }) {
 
         <button
           className={`lp-mic ${grabacion === 'grabando' ? 'grabando' : ''}`}
-          onPointerDown={empezar}
-          onPointerUp={detener}
-          onPointerLeave={detener}
-          onPointerCancel={detener}
+          onPointerDown={alPresionar}
+          onPointerUp={alSoltar}
+          onPointerCancel={alSoltar}
           onContextMenu={(e) => e.preventDefault()}
-          aria-label="Mantén presionado para grabar tu voz"
+          aria-label="Mantén presionado o toca para grabar tu voz"
         >
           <IconMicrofono />
         </button>
         <p className="lp-ayuda">{textoMic}</p>
+        {grabacion === 'error' && (
+          <p className="lp-aviso">
+            Haz clic en el ícono junto a la dirección de la página, permite el micrófono y recarga.
+          </p>
+        )}
 
         <button className="lp-boton-secundario" onClick={reproducir}>Repetir audio</button>
 
-        {(grabacion === 'inactiva' || grabacion === 'error') && (
+        {(grabacion === 'inactiva' || grabacion === 'error' || grabacion === 'permitido') && (
           <button className="lp-enlace" onClick={() => setGrabacion('lista')}>
             No puedo usar el micrófono ahora
           </button>
@@ -353,13 +411,35 @@ function PasoEscuchaRepite({ palabra, onContinuar }) {
   )
 }
 
+// La "imagen" de un número: el número y, debajo, puntos que muestran la cantidad.
+// Si la palabra trae el campo "imagen" en lecciones.js, se usa esa imagen.
+function ImagenNumero({ palabra }) {
+  if (palabra.imagen) {
+    return <img className="lp-mini-imagen" src={palabra.imagen} alt="" />
+  }
+  const n = numeralDe(palabra)
+  if (!n) return <span>{palabra.espanol}</span>
+  return (
+    <>
+      <span className="lp-mini-numero">{n}</span>
+      <span className="lp-mini-cantidad" aria-hidden="true">
+        {Array.from({ length: n }, (_, i) => (
+          <span key={i} className="lp-mini-punto"></span>
+        ))}
+      </span>
+    </>
+  )
+}
+
 /* ---------- Paso: unir las parejas ---------- */
 
-function PasoUnir({ palabras, numero, de, onSiguiente }) {
+// modo 'palabras': une cada palabra en náhuatl con su traducción en español
+// modo 'numeros':  une la imagen de cada número con su palabra en náhuatl
+function PasoUnir({ modo = 'palabras', palabras, numero, de, onSiguiente }) {
   const [izquierda] = useState(() => mezclar(palabras))
   const [derecha] = useState(() => mezclar(palabras))
-  const [selIzq, setSelIzq] = useState(null) // palabra en náhuatl elegida
-  const [selDer, setSelDer] = useState(null) // traducción elegida
+  const [selIzq, setSelIzq] = useState(null) // elemento elegido a la izquierda (su náhuatl)
+  const [selDer, setSelDer] = useState(null) // elemento elegido a la derecha
   const [unidas, setUnidas] = useState([]) // palabras en náhuatl ya unidas
   const [fallo, setFallo] = useState(null) // { izq, der } mientras parpadea en rojo
   const [huboError, setHuboError] = useState(false)
@@ -369,12 +449,15 @@ function PasoUnir({ palabras, numero, de, onSiguiente }) {
     return () => clearTimeout(temporizador.current)
   }, [])
 
+  const esNumeros = modo === 'numeros'
+  // Qué valor identifica a cada elemento de la derecha
+  const valorDerecha = (p) => (esNumeros ? p.nahuatl : p.espanol)
   const completo = unidas.length === palabras.length
-  const traduccionesUnidas = palabras.filter((p) => unidas.includes(p.nahuatl)).map((p) => p.espanol)
+  const derechaUnidas = palabras.filter((p) => unidas.includes(p.nahuatl)).map(valorDerecha)
 
   function evaluar(izq, der) {
     const palabra = palabras.find((p) => p.nahuatl === izq)
-    if (palabra.espanol === der) {
+    if (valorDerecha(palabra) === der) {
       setUnidas((u) => [...u, izq])
       setSelIzq(null)
       setSelDer(null)
@@ -391,21 +474,23 @@ function PasoUnir({ palabras, numero, de, onSiguiente }) {
 
   function elegirIzquierda(p) {
     if (fallo || unidas.includes(p.nahuatl)) return
-    sonar(p.audio)
+    if (!esNumeros) sonar(p.audio)
     const nuevo = selIzq === p.nahuatl ? null : p.nahuatl
     setSelIzq(nuevo)
     if (nuevo && selDer) evaluar(nuevo, selDer)
   }
 
   function elegirDerecha(p) {
-    if (fallo || traduccionesUnidas.includes(p.espanol)) return
-    const nuevo = selDer === p.espanol ? null : p.espanol
+    if (fallo || derechaUnidas.includes(valorDerecha(p))) return
+    if (esNumeros) sonar(p.audio)
+    const nuevo = selDer === valorDerecha(p) ? null : valorDerecha(p)
     setSelDer(nuevo)
     if (nuevo && selIzq) evaluar(selIzq, nuevo)
   }
 
   function claseIzquierda(p) {
     let clase = 'lp-par'
+    if (esNumeros) clase += ' imagen'
     if (unidas.includes(p.nahuatl)) clase += ' unida'
     else if (fallo && fallo.izq === p.nahuatl) clase += ' fallo'
     else if (selIzq === p.nahuatl) clase += ' seleccionada'
@@ -414,30 +499,34 @@ function PasoUnir({ palabras, numero, de, onSiguiente }) {
 
   function claseDerecha(p) {
     let clase = 'lp-par'
-    if (traduccionesUnidas.includes(p.espanol)) clase += ' unida'
-    else if (fallo && fallo.der === p.espanol) clase += ' fallo'
-    else if (selDer === p.espanol) clase += ' seleccionada'
+    if (derechaUnidas.includes(valorDerecha(p))) clase += ' unida'
+    else if (fallo && fallo.der === valorDerecha(p)) clase += ' fallo'
+    else if (selDer === valorDerecha(p)) clase += ' seleccionada'
     return clase
   }
 
   return (
     <>
       <h2 className="lp-actividad">Actividad {numero} de {de}</h2>
-      <p className="lp-instruccion">Selecciona los pares</p>
+      <p className="lp-instruccion">
+        {esNumeros ? 'Une cada número con su nombre en náhuatl' : 'Selecciona los pares'}
+      </p>
 
       <div className="lp-pares">
         <div className="lp-columna">
           {izquierda.map((p) => (
             <button key={p.nahuatl} className={claseIzquierda(p)} onClick={() => elegirIzquierda(p)}>
-              {p.nahuatl}
+              {esNumeros ? <ImagenNumero palabra={p} /> : p.nahuatl}
             </button>
           ))}
         </div>
         <div className="lp-columna">
           {derecha.map((p) => (
-            <button key={p.espanol} className={claseDerecha(p)} onClick={() => elegirDerecha(p)}>
-              {p.colorHex && <span className="lp-par-muestra" style={{ background: p.colorHex }}></span>}
-              {p.espanol}
+            <button key={valorDerecha(p)} className={claseDerecha(p)} onClick={() => elegirDerecha(p)}>
+              {!esNumeros && p.colorHex && (
+                <span className="lp-par-muestra" style={{ background: p.colorHex }}></span>
+              )}
+              {valorDerecha(p)}
             </button>
           ))}
         </div>
@@ -453,8 +542,6 @@ function PasoUnir({ palabras, numero, de, onSiguiente }) {
     </>
   )
 }
-
-/* ---------- Paso: opción múltiple ---------- */
 
 // modo 'opcion':       escucha el audio y elige la palabra en náhuatl
 // modo 'escuchaElige': escucha el audio y elige su significado en español
@@ -911,8 +998,16 @@ function ReproductorLeccion({ categoriaId, leccion, palabras, actividades, onRep
     )
   } else if (fase.tipo === 'escuchar') {
     contenido = <PasoEscuchaRepite palabra={fase.palabra} onContinuar={avanzar} />
-  } else if (fase.tipo === 'unir') {
-    contenido = <PasoUnir palabras={fase.palabras} numero={fase.numero} de={fase.de} onSiguiente={avanzar} />
+    } else if (fase.tipo === 'unir' || fase.tipo === 'unirNumero') {
+    contenido = (
+      <PasoUnir
+        modo={fase.tipo === 'unirNumero' ? 'numeros' : 'palabras'}
+        palabras={fase.palabras}
+        numero={fase.numero}
+        de={fase.de}
+        onSiguiente={avanzar}
+      />
+    )
   } else if (fase.tipo === 'opcion' || fase.tipo === 'escuchaElige' || fase.tipo === 'leeElige') {
     contenido = (
       <PasoOpcionMultiple
