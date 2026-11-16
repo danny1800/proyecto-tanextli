@@ -7,7 +7,7 @@ import MascotaAnimada from './MascotaAnimada' // NUEVO: mascota animada por capa
 //   estado:  reposo | saludo | feliz | celebra | animo | habla | escucha | piensa | sorpresa | error
 //            NUEVO: también baila | pirueta | emocionada | agradecida | curiosa | timida | orgullosa | sonolienta
 //   mensaje: texto del globo de diálogo (opcional)
-//   tamano:  pequeno | mediano | grande
+//   tamano:  mini | pequeno | mediano | grande
 //   globo:   arriba | derecha  (dónde queda el globo respecto a la mascota)
 //   NUEVO  rutina:  nombre de una rutina de data/mascotaAnimaciones.js. La mascota va cambiando de
 //                   estado sola, con su propio ritmo. Si se pone "rutina", se ignora "estado".
@@ -18,8 +18,7 @@ import MascotaAnimada from './MascotaAnimada' // NUEVO: mascota animada por capa
 //   Ejemplo:  <Mascota rutina="menu" tamano="pequeno" entrada="asomar" />
 
 // NUEVO: tamaño en píxeles cuando la animación es de tipo 'capas' (súbelos o bájalos aquí)
-const TAMANOS_CAPAS = { pequeno: 180, mediano: 260, grande: 340 }
-
+const TAMANOS_CAPAS = { mini: 90, barra: 150, pequeno: 180, mediano: 260, grande: 340 }
 // NUEVO: recuerda la última variante elegida de cada estado, para no repetirla dos veces seguidas
 const ultimaVariante = {}
 
@@ -55,7 +54,8 @@ function Mascota({
 
   const actual = pasos && pasos.length > 0 ? pasos[paso] || pasos[0] : null
   const estadoActual = actual ? actual.estado : estado
-  const mensajeActual = actual ? actual.mensaje : mensaje
+  // NUEVO: si el paso de la rutina no trae mensaje, se usa el que se pasó por props
+  const mensajeActual = actual ? (actual.mensaje ?? mensaje) : mensaje
 
   const animacion = animaciones[estadoActual] || animaciones.reposo
 

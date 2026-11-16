@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import { useParams, useNavigate, Navigate } from 'react-router-dom'
 import Mascota from '../components/Mascota'
 import { categorias } from '../data/categorias'
@@ -8,6 +8,10 @@ import { IconAltavoz, IconMicrofono } from '../components/Icons'
 import '../styles/leccion.css'
 import { actividadesDe } from '../data/actividades'
 import { armarPreguntasRepaso, preguntaEscuchaFrase } from '../data/repasoFrases'
+import { rutinas } from '../data/mascotaAnimaciones'
+
+// NUEVO: la rutina de la mascota cambia según la categoría (familia, colores, numeros, frases)
+const RutinaContext = createContext('leccion')
 
 // Títulos que aparecen en la barra de resultado (uno al azar)
 const TITULOS_ACIERTO = ['¡Excelente!', '¡Muy bien!', '¡Perfecto!', '¡Bien hecho!']
@@ -229,27 +233,42 @@ function Cabecera({ titulo, onVolver }) {
 }
 
 function MascotaPista({ pista }) {
+  function MascotaPista({ pista }) {
+  const rutina = useContext(RutinaContext) // NUEVO
   return (
     <div className="lp-mascota-zona">
-      <Mascota estado="reposo" mensaje={pista} tamano="pequeno" globo="arriba" />
+      <Mascota rutina={rutina} mensaje={pista} tamano="pequeno" globo="arriba" />
     </div>
   )
+}
 }
 
 function Muestra({ color }) {
   return <span className="lp-muestra" style={{ background: color }}></span>
 }
 
+// NUEVO: reacciones de la mascota que van rotando, para que no sea siempre la misma
+const ESTADOS_ACIERTO = ['feliz', 'emocionada', 'agradecida', 'orgullosa', 'celebra', 'baila']
+const ESTADOS_ERROR = ['animo', 'timida', 'piensa']
+let turnoAcierto = Math.floor(Math.random() * ESTADOS_ACIERTO.length)
+let turnoError = Math.floor(Math.random() * ESTADOS_ERROR.length)
+
 // Barra que sube desde abajo cuando el usuario comprueba su respuesta
 function BarraResultado({ resultado, detalle, textoBoton, onClick }) {
   const correcto = resultado === 'correcto'
   const [titulo] = useState(() => elegir(correcto ? TITULOS_ACIERTO : TITULOS_ERROR))
+  // NUEVO: cada barra nueva usa la siguiente reacción de la lista
+  const [estadoMascota] = useState(() =>
+    correcto
+      ? ESTADOS_ACIERTO[turnoAcierto++ % ESTADOS_ACIERTO.length]
+      : ESTADOS_ERROR[turnoError++ % ESTADOS_ERROR.length]
+  )
 
   return (
     <div className={`lp-barra ${correcto ? 'correcta' : 'incorrecta'}`} role="status">
       <div className="lp-barra-contenido">
         <div className="lp-barra-info">
-          <Mascota estado={correcto ? 'feliz' : 'animo'} tamano="pequeno" />
+        <Mascota estado={estadoMascota} tamano="barra" entrada={correcto ? 'zoom' : 'aparecer'} />    
           <div>
             <p className="lp-barra-titulo">{titulo}</p>
             {detalle && <p className="lp-barra-detalle">{detalle}</p>}
@@ -936,7 +955,7 @@ function PasoEscritura({ palabra, numero, de, onSiguiente }) {
 function Resumen({ cantidadPalabras, precision, onContinuar, onRepasar }) {
   return (
     <div className="lp-resumen">
-      <Mascota estado="celebra" tamano="grande" />
+<Mascota estado="celebra" tamano="grande" entrada="zoom" />
       <h2 className="lp-resumen-titulo">¡Completaste la lección!</h2>
       <div className="lp-stats">
         <div className="lp-stat naranja">
@@ -967,6 +986,7 @@ function ReproductorLeccion({ categoriaId, leccion, palabras, actividades, onRep
   const [terminado, setTerminado] = useState(false)
 
   const volver = () => navigate(`/categoria/${categoriaId}/lecciones`)
+    const rutinaMascota = rutinas[categoriaId] ? categoriaId : 'leccion' // NUEVO
   const total = fases.length
   const fase = fases[indice]
   const puntuables = fases.filter((f) => f.tipo !== 'escuchar').length
@@ -1036,6 +1056,7 @@ function ReproductorLeccion({ categoriaId, leccion, palabras, actividades, onRep
   }
 
   return (
+        <RutinaContext.Provider value={rutinaMascota}>
     <div className="lp-pagina">
       <Cabecera titulo={`Lección ${leccion.id}: ${leccion.titulo}`} onVolver={volver} />
       {!terminado && (
@@ -1047,6 +1068,7 @@ function ReproductorLeccion({ categoriaId, leccion, palabras, actividades, onRep
         {contenido}
       </main>
     </div>
+     </RutinaContext.Provider>
   )
 }
 
@@ -1075,8 +1097,7 @@ function Leccion() {
         />
         <main className="lp-contenido">
           <div className="lp-fin">
-            <Mascota estado="reposo" mensaje="Esta lección estará lista muy pronto." tamano="grande" globo="arriba" />
-            <button className="lp-boton" onClick={() => navigate(`/categoria/${id}/lecciones`)}>
+<Mascota estado="timida" mensaje="Esta lección estará lista muy pronto." tamano="grande" globo="arriba" />            <button className="lp-boton" onClick={() => navigate(`/categoria/${id}/lecciones`)}>
               Volver a las lecciones
             </button>
           </div>
