@@ -46,10 +46,30 @@ export const INFO_ACTIVIDADES = {
     texto: 'Elige la palabra que falta para completar la frase',
     icono: 'lapiz',
   },
+  escuchaFrase: {
+    titulo: 'Escucha y selecciona',
+    texto: 'Escucha la frase en náhuatl y arma su traducción en español',
+    icono: 'altavoz',
+  },
   opcion: {
     titulo: 'Escucha y elige',
     texto: 'Escucha la palabra y elige cómo se escribe en náhuatl',
     icono: 'altavoz',
+  },
+  escuchaArma: {
+    titulo: 'Escucha y selecciona',
+    texto: 'Escucha la frase en náhuatl y arma su traducción en español',
+    icono: 'altavoz',
+  },
+  leeArma: {
+    titulo: 'Lee y selecciona',
+    texto: 'Lee la frase en español y arma cómo se dice en náhuatl',
+    icono: 'documento',
+  },
+  completaDialogo: {
+    titulo: 'Completa la frase',
+    texto: 'Elige la frase que falta para completar el diálogo',
+    icono: 'lapiz',
   },
 }
 

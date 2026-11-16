@@ -611,3 +611,21 @@
 .lp-ficha:disabled { cursor: default; }
 .lp-ficha.usada { background: #eef2ef; color: transparent; border-color: #e0e6e2; }
 .lp-ficha:disabled:not(.usada) { opacity: 0.6; }
+
+/* Zona donde se arma la frase (repaso de Frases) */
+.lp-armado {
+  width: 100%;
+  max-width: 560px;
+  min-height: 64px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 10px;
+  margin: 14px 0 10px;
+  border-top: 2px solid #cfd6d2;
+  border-bottom: 2px solid #cfd6d2;
+}
+.lp-armado.correcta { border-color: #2e7d32; background: #e9f7ec; }
+.lp-armado.incorrecta { border-color: #b3261e; background: #fdecec; }
+.lp-armado-vacio { color: #7f9d8b; font-size: 14px; font-weight: 600; }

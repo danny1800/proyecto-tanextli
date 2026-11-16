@@ -188,3 +188,10 @@
   margin-top: 16px;
 }
 }
+.auth__help {
+  margin: 0 0 14px;
+  font-size: 14px;
+  color: #52665b;
+  text-align: center;
+  line-height: 1.4;
+}

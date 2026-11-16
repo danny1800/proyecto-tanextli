@@ -135,7 +135,7 @@ export const contenidoLecciones = {
     },
     // Lección 2: Conversación
     2: {
-      actividades: ['escuchar', 'unir', 'opcion', 'escritura'],
+      actividades: ['escuchar', 'leeElige', 'completa', 'escuchaFrase'],
       palabras: [
         { nahuatl: '¿Keni motokay?', espanol: '¿Cómo te llamas?', audio: '/audios/frases-comunes/conversacion/como-te-llamas.m4a' },
         { nahuatl: 'Notokay', espanol: 'Mi nombre es', audio: '/audios/frases-comunes/conversacion/mi-nombre-es.m4a' },
@@ -148,7 +148,7 @@ export const contenidoLecciones = {
     },
     // Lección 3: Expresiones
     3: {
-      actividades: ['escuchar', 'unir', 'opcion', 'escritura'],
+      actividades: ['escuchar', 'leeElige', 'completa', 'escuchaFrase'],
       palabras: [
         { nahuatl: 'Tlasohkamatik', espanol: 'Gracias', audio: '/audios/frases-comunes/expresiones/gracias.m4a' },
         { nahuatl: 'Amo tlen', espanol: 'De nada', audio: '/audios/frases-comunes/expresiones/de-nada.m4a' },
@@ -174,4 +174,52 @@ export const contenidoLecciones = {
       ],
     },
   },
+}
+
+// ---------- Frases comunes: repaso general (lección 5) ----------
+// Une frases ya aprendidas en diálogos cortos. No hay que escribir náhuatl aquí:
+// cada combinación solo dice qué frases (por su texto en español) se juntan y cómo se lee en español.
+// El náhuatl y los audios salen de las lecciones 1 a 4. "{nombre}" se cambia por un nombre al azar.
+const frasesPorLeccion = [1, 2, 3, 4].map((n) => contenidoLecciones.frases[n].palabras)
+const leccionDeFrase = {}
+frasesPorLeccion.forEach((lista, i) => lista.forEach((p) => { leccionDeFrase[p.espanol] = i + 1 }))
+
+const combinacionesFrases = [
+  // Combinaciones de 2 frases
+  { partes: ['Hola', '¿Cómo estás?'], espanol: 'Hola, ¿cómo estás?' },
+  { partes: ['Buenos días', '¿Cómo estás?'], espanol: 'Buenos días, ¿cómo estás?' },
+  { partes: ['¿Cómo estás?', 'Estoy bien'], espanol: '¿Cómo estás? Estoy bien' },
+  { partes: ['Estoy bien', 'Gracias'], espanol: 'Estoy bien, gracias' },
+  { partes: ['Gracias', 'De nada'], espanol: 'Gracias. De nada' },
+  { partes: ['Buenas tardes', '¿De dónde eres?'], espanol: 'Buenas tardes, ¿de dónde eres?' },
+  { partes: ['Hola', '¿Qué necesitas?'], espanol: 'Hola, ¿qué necesitas?' },
+  { partes: ['Sí me gusta', 'Gracias'], espanol: 'Sí me gusta, gracias' },
+  { partes: ['Gracias', 'Hasta luego'], espanol: 'Gracias, hasta luego' },
+  { partes: ['Buenas noches', 'Que descanses'], espanol: 'Buenas noches, que descanses' },
+  { partes: ['Que te vaya bien', 'Hasta luego'], espanol: 'Que te vaya bien, hasta luego' },
+  { partes: ['Cuídate mucho', 'Hasta luego'], espanol: 'Cuídate mucho, hasta luego' },
+  // Combinaciones de 3 frases
+  { partes: ['Hola', 'Mi nombre es', '{nombre}'], espanol: 'Hola, mi nombre es {nombre}' },
+  { partes: ['Mi nombre es', '{nombre}', 'Mucho gusto'], espanol: 'Mi nombre es {nombre}, mucho gusto' },
+  { partes: ['¿Cómo te llamas?', 'Mi nombre es', '{nombre}'], espanol: '¿Cómo te llamas? Mi nombre es {nombre}' },
+  { partes: ['Buenos días', 'Mi nombre es', '{nombre}'], espanol: 'Buenos días, mi nombre es {nombre}' },
+  { partes: ['Hola', '¿Cómo estás?', 'Estoy bien'], espanol: 'Hola, ¿cómo estás? Estoy bien' },
+  { partes: ['Buenas tardes', '¿Cómo estás?', 'Estoy bien'], espanol: 'Buenas tardes, ¿cómo estás? Estoy bien' },
+  { partes: ['Estoy bien', 'Gracias', 'Hasta luego'], espanol: 'Estoy bien, gracias, hasta luego' },
+  { partes: ['Gracias', 'De nada', 'Hasta luego'], espanol: 'Gracias. De nada. Hasta luego' },
+  { partes: ['Buenas noches', 'Gracias', 'Que descanses'], espanol: 'Buenas noches, gracias. Que descanses' },
+  { partes: ['Sí me gusta', 'Gracias', 'Hasta luego'], espanol: 'Sí me gusta, gracias, hasta luego' },
+  { partes: ['Que tengas un buen día', 'Gracias', 'De nada'], espanol: 'Que tengas un buen día. Gracias. De nada' },
+  { partes: ['Buenas tardes', '¿Qué necesitas?', 'Gracias'], espanol: 'Buenas tardes, ¿qué necesitas? Gracias' },
+].map((c, i) => ({
+  ...c,
+  id: i,
+  tieneNombre: c.partes.includes('{nombre}'),
+  lecciones: [...new Set(c.partes.filter((p) => p !== '{nombre}').map((p) => leccionDeFrase[p]))],
+}))
+
+contenidoLecciones.frases[5] = {
+  actividades: ['escuchaArma', 'leeArma', 'completaDialogo'],
+  palabras: frasesPorLeccion.flat(), // las 27 frases (sirven para las opciones de relleno)
+  combinaciones: combinacionesFrases,
 }

@@ -18,8 +18,11 @@ async function pedir(endpoint, { method = "GET", body, token } = {}) {
   }
 
   const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.error || data.message || "Ocurrió un error, intenta de nuevo.");
-  return data;
+  if (!response.ok) {
+  const error = new Error(data.error || data.message || "Ocurrió un error, intenta de nuevo.");
+  error.status = response.status;   // NUEVO
+  throw error;
+}
 }
 
 function guardarSesion(data) {
