@@ -522,4 +522,19 @@
   .pf-logros {
     grid-template-columns: repeat(2, 1fr);
   }
+  /* NUEVO: cabecera de Configuración con la mascota */
+.cf-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.cf-mascota {
+  width: 180px;
+  flex-shrink: 0;
+  margin: -34px 0 -26px;
+}
+@media (max-width: 700px) {
+  .cf-mascota { width: 130px; margin: -20px 0 -14px; }
+}
 }

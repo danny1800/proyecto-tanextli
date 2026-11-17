@@ -60,7 +60,7 @@
   max-width: 820px;
   position: relative;
   margin: 0 auto;
-  padding: 20px 24px 150px; /* espacio abajo para la barra de resultado */
+  padding: 20px 24px 230px; /* espacio abajo para la barra de resultado */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -498,7 +498,7 @@
 @media (max-width: 600px) {
   .lp-cabecera { padding: 12px 14px; }
   .lp-cabecera-titulo { font-size: 19px; }
-  .lp-contenido { padding: 16px 16px 190px; }
+ .lp-contenido { padding: 16px 16px 280px; }
   .lp-barra { padding: 14px 16px; }
   .lp-barra-contenido { flex-direction: column; align-items: stretch; }
   .lp-boton-barra { width: 100%; }
@@ -664,3 +664,16 @@
 .lp-armado.correcta { border-color: #2e7d32; background: #e9f7ec; }
 .lp-armado.incorrecta { border-color: #b3261e; background: #fdecec; }
 .lp-armado-vacio { color: #7f9d8b; font-size: 14px; font-weight: 600; }
+
+/* NUEVO: reserva el espacio de la barra de scroll para que la pantalla no se mueva de lado
+   cuando aparece la barra de resultado */
+html:has(.lp-pagina) { scrollbar-gutter: stable; }
+
+/* La mascota de la barra sobresale por arriba para verse grande sin agrandar la barra */
+.lp-barra-info .mascota {
+  flex-shrink: 0;
+  margin: -75px 0 -6px;
+}
+@media (max-width: 600px) {
+  .lp-barra-info .mascota { margin: -60px 0 -6px; }
+}

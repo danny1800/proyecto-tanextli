@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react' // NUEVO: useEffect, useRef
 import { useNavigate } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
+import Mascota from '../components/Mascota' // NUEVO
 import {
   leerPreferencias,
   guardarPreferencia,
@@ -50,8 +51,21 @@ function Configuracion({ usuario }) {
   const [apodo, setApodo] = useState(preferencias.apodo)
   const [aviso, setAviso] = useState({ seccion: '', texto: '' })
 
+  // NUEVO: reacción momentánea de la mascota (si es null, sigue su rutina)
+  const [reaccion, setReaccion] = useState(null)
+  const temporizador = useRef(null)
+  const reaccionar = (estado) => {
+    clearTimeout(temporizador.current)
+    setReaccion({ estado, n: Date.now() })
+    temporizador.current = setTimeout(() => setReaccion(null), 3500)
+  }
+  useEffect(() => () => clearTimeout(temporizador.current), [])
+
   const avisar = (seccion, texto) => setAviso({ seccion, texto })
-  const cambiar = (clave, valor) => setPreferencias(guardarPreferencia(clave, valor))
+  const cambiar = (clave, valor) => {
+    setPreferencias(guardarPreferencia(clave, valor))
+    if (valor) reaccionar('feliz') // NUEVO
+  }
 
   const guardarApodo = () => {
     const limpio = apodo.trim()
@@ -61,12 +75,14 @@ function Configuracion({ usuario }) {
       'personalizacion',
       limpio ? `Listo: Lobita te llamará «${limpio}».` : 'Listo: Lobita usará tu primer nombre.'
     )
+    reaccionar('agradecida') // NUEVO
   }
 
   const reiniciar = () => {
     if (window.confirm('¿Seguro que quieres borrar tu progreso? Todas las lecciones volverán a estar bloqueadas.')) {
       reiniciarProgreso()
       avisar('cuidado', 'Listo: tu progreso se reinició.')
+      reaccionar('animo') // NUEVO
     }
   }
 
@@ -76,6 +92,7 @@ function Configuracion({ usuario }) {
       setPreferencias(nuevas)
       setApodo('')
       avisar('cuidado', 'Listo: los ajustes regresaron a como estaban.')
+      reaccionar('sorpresa') // NUEVO
     }
   }
 
@@ -91,7 +108,17 @@ function Configuracion({ usuario }) {
       <Sidebar />
 
       <main className="menu-contenido pf-pagina">
-        <h1 className="pf-titulo">Configuración</h1>
+        {/* NUEVO: título + mascota */}
+        <div className="cf-cabecera">
+          <h1 className="pf-titulo">Configuración</h1>
+          <div className="cf-mascota">
+            {reaccion ? (
+              <Mascota estado={reaccion.estado} disparo={reaccion.n} tamano="pequeno" />
+            ) : (
+              <Mascota rutina="configuracion" tamano="pequeno" entrada="deslizar" />
+            )}
+          </div>
+        </div>
 
         <div className="cf-grid">
           {/* Personalización */}

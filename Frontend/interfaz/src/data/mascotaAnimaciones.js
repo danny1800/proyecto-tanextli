@@ -155,6 +155,37 @@ export const rutinas = {
     { estado: 'curiosa', ms: 3000 },
     { estado: 'reposo', ms: 3000 },
   ],
+    // Familia: cariñosa. Saluda, agradece, se pone tímida
+  familia: [
+    { estado: 'saludo',     ms: 3000 },
+    { estado: 'agradecida', ms: 3500 },
+    { estado: 'reposo',     ms: 5000 },
+    { estado: 'timida',     ms: 3000 },
+    { estado: 'feliz',      ms: 3000 },
+  ],
+  // Colores: curiosa. Mira a un lado, se sorprende, se emociona
+  colores: [
+    { estado: 'curiosa',    ms: 4000 },
+    { estado: 'sorpresa',   ms: 2000 },
+    { estado: 'reposo',     ms: 4500 },
+    { estado: 'emocionada', ms: 2500 },
+    { estado: 'piensa',     ms: 3500 },
+  ],
+  // Números: contadora. Piensa, escucha, asiente y presume
+  numeros: [
+    { estado: 'piensa',     ms: 3500 },
+    { estado: 'escucha',    ms: 4000 },
+    { estado: 'reposo',     ms: 4000 },
+    { estado: 'orgullosa',  ms: 3000 },
+    { estado: 'habla',      ms: 3000 },
+  ],
+  // Frases: conversadora. Habla y escucha casi todo el tiempo
+  frases: [
+    { estado: 'habla',      ms: 3500 },
+    { estado: 'escucha',    ms: 3500 },
+    { estado: 'agradecida', ms: 2500 },
+    { estado: 'reposo',     ms: 4500 },
+  ],
 }
 
 // Ejemplo de cómo quedaría con animaciones reales:

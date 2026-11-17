@@ -2,6 +2,7 @@ import { useParams, Link, Navigate, useNavigate } from 'react-router-dom'
 import { cantidadCompletadas } from '../services/progreso'
 import Sidebar from '../components/Sidebar'
 import Mascota from '../components/Mascota' // NUEVO
+import { rutinas } from '../data/mascotaAnimaciones' // NUEVO
 import { categorias } from '../data/categorias'
 import {
   IconFamilia, IconColores, IconFrases, IconNumeros,
@@ -25,6 +26,14 @@ const iconosLeccion = {
   triste: IconCaraTriste,
 }
 
+// NUEVO: cómo aparece la mascota en cada categoría
+const entradaPorCategoria = {
+  familia: 'deslizar',
+  colores: 'zoom',
+  numeros: 'asomar',
+  frases: 'aparecer',
+}
+
 function Categoria() {
   const { id } = useParams()
   const navigate = useNavigate()
@@ -40,6 +49,9 @@ function Categoria() {
   const IconoCategoria = iconosCategoria[id]
   const total = categoria.lecciones.length
   const porcentaje = Math.round((leccionesCompletadas / total) * 100)
+
+  // NUEVO: cada categoría tiene su propia rutina; si no existe, usa la general
+  const rutinaMascota = rutinas[id] ? id : 'categoria'
 
   return (
     <div className="menu-layout">
@@ -60,7 +72,12 @@ function Categoria() {
             {/* NUEVO: la imagen fija quedó comentada (no borrada) */}
             {/* <img src="/mascota.png" alt="Mascota de Tanextli" className="lec-mascota" /> */}
             <div className="lec-mascota">
-              <Mascota rutina="categoria" tamano="pequeno" entrada="deslizar" />
+              <Mascota
+                key={id}
+                rutina={rutinaMascota}
+                tamano="pequeno"
+                entrada={entradaPorCategoria[id] || 'deslizar'}
+              />
             </div>
           </header>
 
