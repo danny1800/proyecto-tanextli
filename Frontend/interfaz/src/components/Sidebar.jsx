@@ -20,17 +20,17 @@ function Sidebar() {
         <NavLink to="/menu" end className="sidebar-link">
           <IconInicio /> Inicio
         </NavLink>
-        <NavLink to="/categoria/familia" className="sidebar-link">
-          <IconFamilia /> Familia
-        </NavLink>
         <NavLink to="/categoria/colores" className="sidebar-link">
           <IconColores /> Colores
         </NavLink>
-        <NavLink to="/categoria/frases" className="sidebar-link">
-          <IconFrases /> Frases
-        </NavLink>
         <NavLink to="/categoria/numeros" className="sidebar-link">
           <IconNumeros /> Números
+        </NavLink>
+        <NavLink to="/categoria/familia" className="sidebar-link">
+          <IconFamilia /> Familia
+        </NavLink>
+        <NavLink to="/categoria/frases" className="sidebar-link">
+          <IconFrases /> Frases
         </NavLink>
       </nav>
 

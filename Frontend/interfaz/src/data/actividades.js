@@ -16,7 +16,7 @@ import { contenidoLecciones } from './lecciones'
 
 // Texto y ícono de cada actividad (se usa en la pantalla "¿Qué hay en cada lección?")
 export const INFO_ACTIVIDADES = {
-    unirNumero: {
+  unirNumero: {
     titulo: 'Une el número',
     texto: 'Une cada número con su nombre en náhuatl',
     icono: 'documento',
@@ -76,12 +76,46 @@ export const INFO_ACTIVIDADES = {
     texto: 'Elige la frase que falta para completar el diálogo',
     icono: 'lapiz',
   },
+  miraColor: {
+    titulo: 'Mira y elige',
+    texto: 'Mira el color y elige cómo se dice en náhuatl',
+    icono: 'documento',
+  },
+  escuchaColor: {
+    titulo: 'Escucha y toca el color',
+    texto: 'Escucha la palabra en náhuatl y toca el color',
+    icono: 'altavoz',
+  },
+    armaNumero: {
+    titulo: 'Arma el número',
+    texto: 'Arma el número en náhuatl tocando sus piezas en orden',
+    icono: 'lapiz',
+  },
+}
+
+// Actividades con rango de números (repaso general de Números)
+INFO_ACTIVIDADES['escritura@1-10'] = {
+  ...INFO_ACTIVIDADES.escritura,
+  texto: 'Escribe en náhuatl los números del 1 al 10',
+}
+INFO_ACTIVIDADES['opcion@11-20'] = {
+  ...INFO_ACTIVIDADES.opcion,
+  texto: 'Escucha el número y elige cómo se dice en náhuatl (del 11 al 20)',
 }
 
 // Actividades por categoría: todas sus lecciones (menos el repaso final) usan las mismas.
 // Las categorías que no estén aquí usan lo que diga cada lección en lecciones.js.
 export const ACTIVIDADES_POR_CATEGORIA = {
-    numeros: ['escuchar', 'unirNumero', 'opcion', 'escritura'],
+  numeros: ['escuchar', 'unirNumero', 'opcion', 'escritura'],
+}
+
+// Lecciones que cambian alguna actividad de su categoría (tienen prioridad)
+// Números 3 (11 al 15) y 4 (16 al 20): en vez de escribir, arman el número con fichas
+export const ACTIVIDADES_POR_LECCION = {
+  numeros: {
+    3: ['escuchar', 'unirNumero', 'opcion', 'armaNumero'],
+    4: ['escuchar', 'unirNumero', 'opcion', 'armaNumero'],
+  },
 }
 
 export const ACTIVIDADES_POR_DEFECTO = ['escuchar', 'opcion', 'escritura']
@@ -92,5 +126,7 @@ export function actividadesDe(categoriaId, leccionId, esFinal = false) {
       ? contenidoLecciones[categoriaId][leccionId].actividades
       : null
   if (esFinal) return propias || ACTIVIDADES_POR_DEFECTO
+  const especial = ACTIVIDADES_POR_LECCION[categoriaId] && ACTIVIDADES_POR_LECCION[categoriaId][leccionId]
+  if (especial) return especial
   return ACTIVIDADES_POR_CATEGORIA[categoriaId] || propias || ACTIVIDADES_POR_DEFECTO
 }

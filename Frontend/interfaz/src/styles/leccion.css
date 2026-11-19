@@ -677,3 +677,190 @@ html:has(.lp-pagina) { scrollbar-gutter: stable; }
 @media (max-width: 600px) {
   .lp-barra-info .mascota { margin: -60px 0 -6px; }
 }
+
+/* Repaso de Colores */
+.lp-color-grande {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  border: 4px solid #cfd6d2;
+  margin: 10px auto 18px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+.lp-colores-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 92px);
+  gap: 16px;
+  justify-content: center;
+  margin: 18px 0;
+}
+.lp-color-opcion {
+  width: 92px;
+  height: 92px;
+  padding: 0;
+  border-radius: 50%;
+  border: 4px solid #cfd6d2;
+  cursor: pointer;
+}
+.lp-color-opcion:hover:not(:disabled) { border-color: #2d6a4f; }
+.lp-color-opcion:disabled { cursor: default; }
+.lp-color-opcion.seleccionada { border-color: #1b4332; box-shadow: 0 0 0 4px #b7e4c7; }
+.lp-color-opcion.correcta { border-color: #2e7d32; box-shadow: 0 0 0 4px #a5d6a7; }
+.lp-color-opcion.incorrecta { border-color: #b3261e; box-shadow: 0 0 0 4px #f4b6b2; }
+
+/* ---------- Repaso general: inicio y resultados ---------- */
+.lp-repaso {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  max-width: 460px;
+  margin: 0 auto;
+  text-align: center;
+}
+.lp-repaso-titulo { font-size: 1.9rem; margin: 0; }
+.lp-repaso-sub { margin: 0; color: #6b6b6b; }
+.lp-repaso-lista { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+.lp-repaso-card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas: 'num cant' 'nombre cant';
+  align-items: center;
+  text-align: left;
+  padding: 14px 16px;
+  border: 2px solid #e5e5e5;
+  border-radius: 16px;
+  background: #fff;
+}
+.lp-repaso-num { grid-area: num; font-size: 0.8rem; color: #8a8a8a; }
+.lp-repaso-nombre { grid-area: nombre; font-size: 1.05rem; }
+.lp-repaso-cant {
+  grid-area: cant;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #fff1e0;
+  color: #d9730d;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+.lp-repaso-desempeno {
+  width: 100%;
+  padding: 16px;
+  border: 2px solid #e5e5e5;
+  border-radius: 16px;
+  background: #fff;
+}
+.lp-repaso-desempeno-titulo { margin: 0 0 8px; font-weight: 700; text-align: left; }
+.lp-repaso-fila {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-top: 1px solid #eee;
+}
+.lp-repaso-fila strong { color: #2e9e4f; }
+.lp-repaso-botones { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+
+/* ---------- Repaso general: tarjetas de inicio (como el Figma) ---------- */
+.lp-repaso-intro { gap: 28px; padding-top: 12px; }
+.lp-repaso-intro .lp-repaso-sub {
+  max-width: 300px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #6b6b6b;
+}
+.lp-rlista { display: flex; flex-direction: column; gap: 26px; width: 100%; align-items: center; }
+
+.lp-rcard {
+  --fondo: #c9e4d4; --borde: #a8cdb6; --tinta: #1f4d3a;
+  display: grid;
+  grid-template-columns: 56px 1fr 34px;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  max-width: 320px;
+  padding: 14px 16px;
+  border: 2px solid var(--borde);
+  border-radius: 12px;
+  background: var(--fondo);
+  color: var(--tinta);
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12);
+  transition: transform 0.15s;
+}
+.lp-rcard:hover { transform: translateY(-2px); }
+.lp-rcard.morado  { --fondo: #f1defc; --borde: #cdb3e0; --tinta: #4b0f6b; }
+.lp-rcard.naranja { --fondo: #ffe6c9; --borde: #e8c294; --tinta: #8a4a05; }
+.lp-rcard.azul    { --fondo: #d5e6fb; --borde: #a9c6e8; --tinta: #1c4a7a; }
+
+.lp-rcard-icono { width: 48px; height: 48px; display: grid; place-items: center; }
+.lp-rcard-icono svg { width: 100%; height: 100%; }
+.lp-rcard-texto { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.lp-rcard-num { font-size: 1rem; letter-spacing: 0.02em; }
+.lp-rcard-nombre { font-size: 1.1rem; }
+.lp-rcard-pastilla {
+  padding: 3px 14px;
+  border: 1px solid var(--tinta);
+  border-radius: 999px;
+  font-size: 0.78rem;
+  background: rgba(255, 255, 255, 0.35);
+}
+.lp-rcard-flecha { width: 32px; height: 32px; opacity: 0.85; }
+.lp-rcard.hecha .lp-rcard-pastilla { background: var(--tinta); color: #fff; }
+.en-repaso .lp-actividad { display: none; }
+/* Nombre en español debajo de cada círculo */
+.lp-color-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.lp-color-nombre {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1f4d3a;
+}
+
+/* ---------- Repaso general: pantalla de resultados (como el Figma) ---------- */
+.lp-repaso-final { max-width: 560px; }
+
+.lp-repaso-desempeno {
+  width: 100%;
+  padding: 22px 26px;
+  border: 2px solid #cfd8d2;
+  border-radius: 18px;
+  background: #ecf5f0;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+}
+.lp-repaso-desempeno-titulo {
+  margin: 0 0 14px;
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #1f4d3a;
+}
+.lp-repaso-fila {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 4px;
+  border-top: 2px solid #cfd8d2;
+  text-align: left;
+}
+.lp-repaso-fila-texto { display: flex; flex-direction: column; gap: 2px; }
+.lp-repaso-fila-num { font-size: 0.85rem; color: #1f4d3a; }
+.lp-repaso-fila-nombre { font-size: 1.25rem; color: #1f4d3a; }
+.lp-repaso-fila-nota { font-size: 2rem; color: #1f4d3a; }
+
+/* Los 3 botones: mismo ancho y estilo */
+.lp-repaso-botones { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 340px; }
+.lp-repaso-botones > button { width: 100%; }
+.lp-repaso-botones .lp-boton-secundario {
+  border: 2px solid #cfd8d2;
+  background: #fff;
+  color: #1f4d3a;
+  font-weight: 700;
+  text-decoration: none;
+}

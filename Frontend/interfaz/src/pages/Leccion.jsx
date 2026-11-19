@@ -132,17 +132,81 @@ function elegirDistractores(p, palabras, todasLasPalabras, campo) {
   return elegidas
 }
 
+// Elige colores para una actividad del repaso: primero los que aún no han salido
+function elegirColores(palabras, cantidad, usados) {
+  const nuevos = mezclar(palabras.filter((p) => !usados.has(p.nahuatl)))
+  const elegidos = nuevos.slice(0, cantidad)
+  if (elegidos.length < cantidad) {
+    const resto = mezclar(palabras.filter((p) => !elegidos.includes(p)))
+    elegidos.push(...resto.slice(0, cantidad - elegidos.length))
+  }
+  elegidos.forEach((p) => usados.add(p.nahuatl))
+  return mezclar(elegidos)
+}
+
+// Arma el número: fichas con las piezas del número en náhuatl + 3 piezas de otros números
+function armarNumero(p, palabras, todasLasPalabras) {
+  const piezas = p.nahuatl.trim().split(/\s+/)
+  const enNumero = new Set(piezas.map(normalizar))
+  const vistas = new Set()
+  const equivocadas = []
+  for (const q of [...mezclar(palabras), ...mezclar(todasLasPalabras)]) {
+    for (const t of q.nahuatl.trim().split(/\s+/)) {
+      const k = normalizar(t)
+      if (enNumero.has(k) || vistas.has(k)) continue
+      vistas.add(k)
+      equivocadas.push(t)
+    }
+    if (equivocadas.length >= 3) break
+  }
+  const fichas = [
+    ...piezas.map((t, i) => ({ id: `n${i}`, texto: t })),
+    ...equivocadas.slice(0, 3).map((t, i) => ({ id: `x${i}`, texto: t })),
+  ]
+  return { palabra: { ...p, modoArmar: 'numero', audios: [], solucion: piezas }, opciones: mezclar(fichas) }
+}
+
+// Mezcla los números de modo que ninguno quede junto a su anterior o siguiente (7 y 8, 12 y 13...)
+function mezclarSinConsecutivos(lista) {
+  let ultima = mezclar(lista)
+  for (let intento = 0; intento < 300; intento++) {
+    const prueba = mezclar(lista)
+    const bien = prueba.every(
+      (p, i) => i === 0 || Math.abs((numeralDe(p) || 0) - (numeralDe(prueba[i - 1]) || 0)) !== 1,
+    )
+    if (bien) return prueba
+    ultima = prueba
+  }
+  return ultima
+}
+
+// "1-10" → solo los números del 1 al 10, revueltos
+function palabrasDelRango(palabras, rango) {
+  const [desde, hasta] = rango.split('-').map(Number)
+  return mezclarSinConsecutivos(
+    palabras.filter((p) => {
+      const n = numeralDe(p)
+      return n >= desde && n <= hasta
+    }),
+  )
+}
+
 // Arma la lista de pasos de la lección en el orden que indique "actividades"
-function construirFases(palabras, todasLasPalabras, actividades) {
+function construirFases(palabrasLeccion, todasLasPalabras, actividades) {
   const puntuables = actividades.filter((a) => a !== 'escuchar')
   const de = puntuables.length
   const numeroDe = (tipo) => puntuables.indexOf(tipo) + 1
   const fases = []
   const usadosRepaso = new Set() // combinaciones ya usadas (para no repetirlas entre actividades)
+  const usadosColor = new Set() // colores ya preguntados (para que entren los 11 en el repaso)
 
-  actividades.forEach((tipo) => {
+  actividades.forEach((entrada) => {
+    // "escritura@1-10" = la actividad "escritura" solo con los números del 1 al 10
+    const [tipo, rango] = entrada.split('@')
+    const palabras = rango ? palabrasDelRango(palabrasLeccion, rango) : palabrasLeccion
+    const numeroDe = () => puntuables.indexOf(entrada) + 1
     if (tipo === 'escuchar') {
-      palabras.forEach((p) => fases.push({ tipo, palabra: p }))
+      palabras.forEach((p) => fases.push({ tipo, palabra: { ...p, audio: p.audioCompleto || p.audio } }))
     } else if (tipo === 'unir' || tipo === 'unirNumero') {
       fases.push({ tipo, palabras, numero: numeroDe(tipo), de })
     } else if (tipo === 'opcion' || tipo === 'escuchaElige' || tipo === 'leeElige') {
@@ -150,7 +214,9 @@ function construirFases(palabras, todasLasPalabras, actividades) {
       const campo = tipo === 'escuchaElige' ? 'espanol' : 'nahuatl'
       palabras.forEach((p) => {
         const opciones = mezclar([p, ...elegirDistractores(p, palabras, todasLasPalabras, campo)])
-        fases.push({ tipo, palabra: p, opciones, numero: numeroDe(tipo), de })
+        // En "opcion" suena la palabra en español (si existe) y se elige el náhuatl
+        const palabraConAudio = tipo === 'opcion' ? { ...p, audio: p.audioEspanol || p.audio } : p
+        fases.push({ tipo, palabra: palabraConAudio, opciones, numero: numeroDe(tipo), de })
       })
     } else if (tipo === 'completa' || tipo === 'completaEs') {
       // 'completa': frase en náhuatl (con la traducción arriba)
@@ -170,6 +236,13 @@ function construirFases(palabras, todasLasPalabras, actividades) {
             })
           }
         })
+    } else if (tipo === 'miraColor' || tipo === 'escuchaColor') {
+      // Repaso de Colores: 10 preguntas por actividad con los colores revueltos, y las 10 opciones
+      const modoColor = tipo === 'miraColor' ? 'mira' : 'escucha'
+      elegirColores(palabras, 10, usadosColor).forEach((p) => {
+        const opciones = mezclar([p, ...mezclar(palabras.filter((q) => q.nahuatl !== p.nahuatl)).slice(0, 5)])
+        fases.push({ tipo: 'completa', palabra: { ...p, modoColor }, partes: [], hueco: 0, opciones, numero: numeroDe(tipo), de })
+      })
     } else if (tipo === 'escuchaFrase') {
       // Escucha la frase en náhuatl y arma su traducción en español con fichas (todas las frases de la lección)
       palabras
@@ -182,6 +255,10 @@ function construirFases(palabras, todasLasPalabras, actividades) {
       const combinaciones = Object.values(contenidoLecciones).flatMap((c) => Object.values(c)).flatMap((l) => l.combinaciones || [])
       armarPreguntasRepaso(tipo, combinaciones, palabras, usadosRepaso).forEach((q) =>
         fases.push({ tipo: 'completa', ...q, numero: numeroDe(tipo), de }),
+      )
+    } else if (tipo === 'armaNumero') {
+      palabras.forEach((p) =>
+        fases.push({ tipo: 'completa', ...armarNumero(p, palabras, todasLasPalabras), numero: numeroDe(tipo), de }),
       )
     } else if (tipo === 'escritura') {
       palabras.forEach((p) => fases.push({ tipo, palabra: p, numero: numeroDe(tipo), de }))
@@ -234,13 +311,13 @@ function Cabecera({ titulo, onVolver }) {
 
 function MascotaPista({ pista }) {
   function MascotaPista({ pista }) {
-  const rutina = useContext(RutinaContext) // NUEVO
-  return (
-    <div className="lp-mascota-zona">
-      <Mascota rutina={rutina} mensaje={pista} tamano="pequeno" globo="arriba" />
-    </div>
-  )
-}
+    const rutina = useContext(RutinaContext) // NUEVO
+    return (
+      <div className="lp-mascota-zona">
+        <Mascota rutina={rutina} mensaje={pista} tamano="pequeno" globo="arriba" />
+      </div>
+    )
+  }
 }
 
 function Muestra({ color }) {
@@ -268,7 +345,7 @@ function BarraResultado({ resultado, detalle, textoBoton, onClick }) {
     <div className={`lp-barra ${correcto ? 'correcta' : 'incorrecta'}`} role="status">
       <div className="lp-barra-contenido">
         <div className="lp-barra-info">
-        <Mascota estado={estadoMascota} tamano="barra" entrada={correcto ? 'zoom' : 'aparecer'} />    
+          <Mascota estado={estadoMascota} tamano="barra" entrada={correcto ? 'zoom' : 'aparecer'} />
           <div>
             <p className="lp-barra-titulo">{titulo}</p>
             {detalle && <p className="lp-barra-detalle">{detalle}</p>}
@@ -371,7 +448,7 @@ function PasoEscuchaRepite({ palabra, onContinuar }) {
   }
 
   const textoMic = {
-    inactiva: 'Mantén presionado y repite (o toca para empezar y toca para terminar)',
+    inactiva: 'Toca el icono del micrófono para empezar y toca para terminar',
     grabando: modoToque
       ? 'Grabando... toca de nuevo para terminar'
       : 'Grabando... suelta o toca de nuevo para terminar',
@@ -494,6 +571,7 @@ function PasoUnir({ modo = 'palabras', palabras, numero, de, onSiguiente }) {
   function elegirIzquierda(p) {
     if (fallo || unidas.includes(p.nahuatl)) return
     if (!esNumeros) sonar(p.audio)
+    else sonar(p.audioEspanol) // el número suena en español ("dos")
     const nuevo = selIzq === p.nahuatl ? null : p.nahuatl
     setSelIzq(nuevo)
     if (nuevo && selDer) evaluar(nuevo, selDer)
@@ -502,6 +580,7 @@ function PasoUnir({ modo = 'palabras', palabras, numero, de, onSiguiente }) {
   function elegirDerecha(p) {
     if (fallo || derechaUnidas.includes(valorDerecha(p))) return
     if (esNumeros) sonar(p.audio)
+    else if (p.audioEspanol) sonar(p.audioEspanol) // NUEVO: la palabra en español suena en español
     const nuevo = selDer === valorDerecha(p) ? null : valorDerecha(p)
     setSelDer(nuevo)
     if (nuevo && selIzq) evaluar(selIzq, nuevo)
@@ -579,6 +658,16 @@ function PasoOpcionMultiple({ modo, palabra, opciones, numero, de, onSiguiente }
     leeElige: 'Lee la palabra y elige cómo se dice en náhuatl',
   }
 
+  // Texto fijo que explica en qué consiste la actividad (se ve arriba del audio)
+  const instrucciones = {
+    opcion: palabra.audioEspanol
+      ? 'Escucha la palabra en español y elige cómo se dice en náhuatl'
+      : 'Escucha la palabra y elige cómo se escribe en náhuatl',
+    escuchaElige: 'Escucha la palabra en náhuatl y elige su significado en español',
+    leeElige: 'Lee la palabra en español y elige cómo se dice en náhuatl',
+    numeroElige: 'Mira el número y elige cómo se dice en náhuatl',
+  }
+
   function comprobar() {
     const acierto = seleccion === idDe(palabra)
     if (!acierto) setFallos((f) => f + 1)
@@ -593,6 +682,8 @@ function PasoOpcionMultiple({ modo, palabra, opciones, numero, de, onSiguiente }
   return (
     <>
       <h2 className="lp-actividad">Actividad {numero} de {de}</h2>
+      <p className="lp-instruccion">{instrucciones[modo]}</p>
+      {resultado === null && <MascotaPista pista={pistas[modo]} />}
       {resultado === null && <MascotaPista pista={pistas[modo]} />}
 
       {modo === 'leeElige' ? (
@@ -742,6 +833,7 @@ function PasoCompletaHueco({ palabra, partes, hueco, opciones, numero, de, onSig
 // modo 'lee':     se lee la frase en español y se arma el náhuatl (fichas con frases)
 function PasoArmar({ palabra, opciones, numero, de, onSiguiente }) {
   const escucha = palabra.modoArmar === 'escucha'
+  const esNumero = palabra.modoArmar === 'numero'
   const [elegidas, setElegidas] = useState([]) // ids de las fichas, en el orden en que se tocaron
   const [resultado, setResultado] = useState(null) // null | correcto | incorrecto
   const [fallos, setFallos] = useState(0)
@@ -802,10 +894,10 @@ function PasoArmar({ palabra, opciones, numero, de, onSiguiente }) {
     <>
       <h2 className="lp-actividad">Actividad {numero} de {de}</h2>
       <p className="lp-instruccion">
-        {escucha ? 'Escucha y selecciona las palabras' : 'Lee y selecciona las frases en náhuatl'}
+        {escucha ? 'Escucha y selecciona las palabras' : esNumero ? 'Arma el número en náhuatl' : 'Lee y selecciona las frases en náhuatl'}
       </p>
       {resultado === null && (
-        <MascotaPista pista={escucha ? 'Escucha y arma la frase en español' : 'Arma la frase en náhuatl, en orden'} />
+        <MascotaPista pista={escucha ? 'Escucha y arma la frase en español' : esNumero ? 'Toca las piezas en orden para armar el número' : 'Arma la frase en náhuatl, en orden'} />
       )}
 
       {escucha ? (
@@ -817,8 +909,18 @@ function PasoArmar({ palabra, opciones, numero, de, onSiguiente }) {
         </>
       ) : (
         <div className="lp-tarjeta">
-          <p className="lp-traduccion">Lee la frase</p>
-          <h2 className="lp-palabra">{palabra.espanol}</h2>
+          {esNumero ? (
+            <>
+              <p className="lp-traduccion">Arma este número</p>
+              <h2 className="lp-palabra">{numeralDe(palabra)}</h2>
+              <p className="lp-traduccion">{palabra.espanol}</p>
+            </>
+          ) : (
+            <>
+              <p className="lp-traduccion">Lee la frase</p>
+              <h2 className="lp-palabra">{palabra.espanol}</h2>
+            </>
+          )}
         </div>
       )}
 
@@ -861,7 +963,100 @@ function PasoArmar({ palabra, opciones, numero, de, onSiguiente }) {
 
 // El reproductor sigue usando "PasoCompleta": este paso elige cuál de los dos se muestra
 function PasoCompleta(props) {
+  if (props.palabra.modoColor) return <PasoColor {...props} />
   return props.palabra.modoArmar ? <PasoArmar {...props} /> : <PasoCompletaHueco {...props} />
+}
+
+/* ---------- Paso: repaso de Colores ---------- */
+
+// modo 'mira':    se ve un círculo de color y se elige cómo se dice en náhuatl (6 botones)
+// modo 'escucha': suena la palabra en náhuatl y se toca el círculo del color (6 círculos)
+function PasoColor({ palabra, opciones, numero, de, onSiguiente }) {
+  const escucha = palabra.modoColor === 'escucha'
+  const { reproducir, aviso } = useAudio(palabra.audio)
+  const [seleccion, setSeleccion] = useState(null) // náhuatl de la opción elegida
+  const [resultado, setResultado] = useState(null) // null | correcto | incorrecto
+  const [fallos, setFallos] = useState(0)
+
+  function comprobar() {
+    const acierto = seleccion === palabra.nahuatl
+    if (!acierto) setFallos((f) => f + 1)
+    setResultado(acierto ? 'correcto' : 'incorrecto')
+  }
+
+  function reintentar() {
+    setSeleccion(null)
+    setResultado(null)
+  }
+
+  const claseDe = (base, op) => {
+    let clase = base
+    if (seleccion === op.nahuatl) {
+      clase += resultado ? (resultado === 'correcto' ? ' correcta' : ' incorrecta') : ' seleccionada'
+    }
+    return clase
+  }
+
+  return (
+    <>
+      <h2 className="lp-actividad">Actividad {numero} de {de}</h2>
+      <p className="lp-instruccion">
+        {escucha ? 'Escucha la palabra en náhuatl y toca el color' : 'Mira el color y elige cómo se dice en náhuatl'}
+      </p>
+      {resultado === null && (
+        <MascotaPista pista={escucha ? 'Escucha con atención y toca el color correcto' : 'Mira el color y elige su nombre'} />
+      )}
+
+      {escucha ? (
+        <>
+          <button className="lp-audio" onClick={reproducir} aria-label="Escuchar la palabra">
+            <IconAltavoz />
+          </button>
+          {aviso && <p className="lp-aviso">No se pudo reproducir el audio.</p>}
+          <div className="lp-colores-grid">
+            {opciones.map((op) => (
+              <div key={op.nahuatl} className="lp-color-item">
+                <button
+                  className={claseDe('lp-color-opcion', op)}
+                  style={{ background: op.colorHex }}
+                  disabled={resultado !== null}
+                  onClick={() => setSeleccion(op.nahuatl)}
+                  aria-label={op.espanol}
+                />
+                <span className="lp-color-nombre">{op.espanol}</span>
+              </div>
+            ))}
+          </div>
+        </>
+      ) : (
+        <>
+          <div className="lp-color-grande" style={{ background: palabra.colorHex }} aria-label="Color" />
+          <div className="lp-opciones lp-opciones-seis">
+            {opciones.map((op) => (
+              <button
+                key={op.nahuatl}
+                className={claseDe('lp-opcion', op)}
+                disabled={resultado !== null}
+                onClick={() => setSeleccion(op.nahuatl)}
+              >
+                {op.nahuatl}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+
+      {resultado === null ? (
+        <button className="lp-boton" onClick={comprobar} disabled={!seleccion}>Comprobar</button>
+      ) : (
+        <BarraResultado
+          resultado={resultado}
+          textoBoton={resultado === 'correcto' ? 'Continuar' : 'Intentar de nuevo'}
+          onClick={resultado === 'correcto' ? () => onSiguiente(fallos === 0) : reintentar}
+        />
+      )}
+    </>
+  )
 }
 
 /* ---------- Paso: escritura ---------- */
@@ -955,7 +1150,7 @@ function PasoEscritura({ palabra, numero, de, onSiguiente }) {
 function Resumen({ cantidadPalabras, precision, onContinuar, onRepasar }) {
   return (
     <div className="lp-resumen">
-<Mascota estado="celebra" tamano="grande" entrada="zoom" />
+      <Mascota estado="celebra" tamano="grande" entrada="zoom" />
       <h2 className="lp-resumen-titulo">¡Completaste la lección!</h2>
       <div className="lp-stats">
         <div className="lp-stat naranja">
@@ -975,6 +1170,117 @@ function Resumen({ cantidadPalabras, precision, onContinuar, onRepasar }) {
   )
 }
 
+/* ---------- Repaso general: pantalla de inicio y de resultados ---------- */
+
+const TITULOS_REPASO = {
+  miraColor: 'Mira y elige',
+  escuchaColor: 'Escucha y toca el color',
+  escuchaArma: 'Escucha y selecciona',
+  leeArma: 'Lee y selecciona',
+  completaDialogo: 'Completa la frase',
+  unir: 'Une las parejas',
+  unirNumero: 'Une número y nombre',
+  opcion: 'Escucha y elige',
+  escuchaElige: 'Escucha y selecciona',
+  leeElige: 'Lee y selecciona',
+  completa: 'Completa la frase',
+  completaEs: 'Escucha y completa',
+  escuchaFrase: 'Escucha y arma la frase',
+  escritura: 'Escribe en náhuatl',
+}
+
+const plural = (n) => `${n} ${n === 1 ? 'pregunta' : 'preguntas'}`
+
+// Colores de las tarjetas, en orden: verde, morado, naranja, azul
+const ESTILO_REPASO = ['verde', 'morado', 'naranja', 'azul']
+
+// Qué ícono lleva cada tipo de actividad
+const ICONO_REPASO = {
+  miraColor: 'doc', leeArma: 'doc', leeElige: 'doc',
+  escuchaColor: 'audio', escuchaArma: 'audio', escuchaFrase: 'audio', escuchaElige: 'audio', opcion: 'audio',
+  completaDialogo: 'lapiz', completa: 'lapiz', completaEs: 'lapiz', escritura: 'lapiz',
+}
+
+function IconoRepaso({ tipo }) {
+  const icono = ICONO_REPASO[tipo] || 'doc'
+  if (icono === 'audio') return <IconAltavoz />
+  if (icono === 'lapiz') {
+    return (
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M3 17.25V21h3.75L17.8 9.94l-3.75-3.75L3 17.25zM20.7 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+      </svg>
+    )
+  }
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M6 2h8l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm1.5 9h9v2h-9v-2zm0 4h9v2h-9v-2zm0-8h5v2h-5V7z" />
+    </svg>
+  )
+}
+
+function IntroRepaso({ actividades, hechas, aciertos, onEmpezar }) {
+  return (
+    <div className="lp-repaso lp-repaso-intro">
+      <p className="lp-repaso-sub">Pon a prueba tus conocimientos con las actividades de repaso</p>
+
+      <div className="lp-rlista">
+        {actividades.map((a, i) => {
+          const hecha = hechas.includes(a.numero)
+          return (
+            <button
+              key={a.numero}
+              className={`lp-rcard ${ESTILO_REPASO[i % ESTILO_REPASO.length]} ${hecha ? 'hecha' : ''}`}
+              onClick={() => onEmpezar(a.numero)}
+            >
+              <span className="lp-rcard-icono"><IconoRepaso tipo={a.tipo} /></span>
+              <span className="lp-rcard-texto">
+                <span className="lp-rcard-num">Actividad {a.numero}</span>
+                <strong className="lp-rcard-nombre">{TITULOS_REPASO[a.tipo] || a.tipo}</strong>
+                <span className="lp-rcard-pastilla">
+                  {hecha ? `✓ ${aciertos[a.numero] || 0}/${a.total}` : plural(a.total)}
+                </span>
+              </span>
+              <svg className="lp-rcard-flecha" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M10.5 8.5l3.5 3.5-3.5 3.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+function ResumenRepaso({ actividades, aciertos, onContinuar, onInicio, onProgreso }) {
+  return (
+    <div className="lp-repaso lp-repaso-final">
+      <Mascota estado="celebra" tamano="grande" entrada="zoom" />
+      <h2 className="lp-repaso-titulo">¡Felicidades!</h2>
+      <p className="lp-repaso-sub">Has completado el repaso general</p>
+
+      <div className="lp-repaso-desempeno">
+        <p className="lp-repaso-desempeno-titulo">Desempeño por actividad</p>
+        {actividades.map((a) => (
+          <div key={a.numero} className="lp-repaso-fila">
+            <div className="lp-repaso-fila-texto">
+              <span className="lp-repaso-fila-num">Actividad {a.numero}</span>
+              <strong className="lp-repaso-fila-nombre">{TITULOS_REPASO[a.tipo] || a.tipo}</strong>
+            </div>
+            <strong className="lp-repaso-fila-nota">{aciertos[a.numero] || 0}/{a.total}</strong>
+          </div>
+        ))}
+      </div>
+
+      <div className="lp-repaso-botones">
+        <button className="lp-boton" onClick={onContinuar}>Continuar</button>
+        <button className="lp-boton-secundario" onClick={onInicio}>Volver al inicio</button>
+        <button className="lp-boton-secundario" onClick={onProgreso}>Ver mi progreso</button>
+      </div>
+    </div>
+  )
+}
+
 /* ---------- Recorrido completo de una lección ---------- */
 
 function ReproductorLeccion({ categoriaId, leccion, palabras, actividades, onRepasar }) {
@@ -983,22 +1289,62 @@ function ReproductorLeccion({ categoriaId, leccion, palabras, actividades, onRep
   const [fases] = useState(() => construirFases(palabras, todasLasPalabras, actividades))
   const [indice, setIndice] = useState(0)
   const [aciertosPrimero, setAciertosPrimero] = useState(0)
+  const [aciertosPorActividad, setAciertosPorActividad] = useState({})
   const [terminado, setTerminado] = useState(false)
+  const esRepaso = !!leccion.final
+  const [activa, setActiva] = useState(null) // repaso: número de la actividad en curso (null = tarjetas)
+  const [hechas, setHechas] = useState([]) // repaso: actividades ya terminadas
 
   const volver = () => navigate(`/categoria/${categoriaId}/lecciones`)
-    const rutinaMascota = rutinas[categoriaId] ? categoriaId : 'leccion' // NUEVO
+  const rutinaMascota = rutinas[categoriaId] ? categoriaId : 'leccion'
   const total = fases.length
   const fase = fases[indice]
   const puntuables = fases.filter((f) => f.tipo !== 'escuchar').length
   const precision = puntuables ? Math.round((aciertosPrimero / puntuables) * 100) : 100
 
+  const resumenActividades = actividades
+    .filter((a) => a !== 'escuchar')
+    .map((entrada, i) => ({ tipo: entrada.split('@')[0], numero: i + 1, total: fases.filter((f) => f.numero === i + 1).length }))
+
+  const enIntro = esRepaso && activa === null && !terminado
+
+  // Progreso: en el repaso se mide solo dentro de la actividad en curso
+  let progreso = Math.round((indice / total) * 100)
+  if (esRepaso && activa !== null) {
+    const inicio = fases.findIndex((f) => f.numero === activa)
+    const cantidad = fases.filter((f) => f.numero === activa).length
+    progreso = Math.round(((indice - inicio) / cantidad) * 100)
+  }
+
   useEffect(() => {
     if (terminado) marcarLeccionCompletada(categoriaId, leccion.id)
   }, [terminado, categoriaId, leccion.id])
 
+  function empezarActividad(numero) {
+    setAciertosPorActividad((a) => ({ ...a, [numero]: 0 })) // si la repite, empieza de cero
+    setIndice(fases.findIndex((f) => f.numero === numero))
+    setActiva(numero)
+  }
+
   // primerIntento: true si el usuario acertó a la primera (se usa para la precisión)
   function avanzar(primerIntento) {
-    if (primerIntento) setAciertosPrimero((n) => n + 1)
+    if (primerIntento) {
+      setAciertosPrimero((n) => n + 1)
+      if (fase.numero) {
+        setAciertosPorActividad((a) => ({ ...a, [fase.numero]: (a[fase.numero] || 0) + 1 }))
+      }
+    }
+
+    // Repaso: al acabar una actividad se regresa a las tarjetas
+    const siguiente = fases[indice + 1]
+    if (esRepaso && (!siguiente || siguiente.numero !== fase.numero)) {
+      const nuevas = hechas.includes(fase.numero) ? hechas : [...hechas, fase.numero]
+      setHechas(nuevas)
+      setActiva(null)
+      if (nuevas.length >= resumenActividades.length) setTerminado(true)
+      return
+    }
+
     if (indice + 1 >= total) {
       setTerminado(true)
     } else {
@@ -1007,7 +1353,26 @@ function ReproductorLeccion({ categoriaId, leccion, palabras, actividades, onRep
   }
 
   let contenido
-  if (terminado) {
+  if (enIntro) {
+    contenido = (
+      <IntroRepaso
+        actividades={resumenActividades}
+        hechas={hechas}
+        aciertos={aciertosPorActividad}
+        onEmpezar={empezarActividad}
+      />
+    )
+  } else if (terminado && esRepaso) {
+    contenido = (
+      <ResumenRepaso
+        actividades={resumenActividades}
+        aciertos={aciertosPorActividad}
+        onContinuar={volver}
+        onInicio={() => navigate('/menu')}
+        onProgreso={() => navigate('/perfil')}
+      />
+    )
+  } else if (terminado) {
     contenido = (
       <Resumen
         cantidadPalabras={palabras.length}
@@ -1018,7 +1383,7 @@ function ReproductorLeccion({ categoriaId, leccion, palabras, actividades, onRep
     )
   } else if (fase.tipo === 'escuchar') {
     contenido = <PasoEscuchaRepite palabra={fase.palabra} onContinuar={avanzar} />
-    } else if (fase.tipo === 'unir' || fase.tipo === 'unirNumero') {
+  } else if (fase.tipo === 'unir' || fase.tipo === 'unirNumero') {
     contenido = (
       <PasoUnir
         modo={fase.tipo === 'unirNumero' ? 'numeros' : 'palabras'}
@@ -1056,19 +1421,25 @@ function ReproductorLeccion({ categoriaId, leccion, palabras, actividades, onRep
   }
 
   return (
-        <RutinaContext.Provider value={rutinaMascota}>
-    <div className="lp-pagina">
-      <Cabecera titulo={`Lección ${leccion.id}: ${leccion.titulo}`} onVolver={volver} />
-      {!terminado && (
-        <div className="lp-progreso">
-          <div className="lp-progreso-relleno" style={{ width: `${Math.round((indice / total) * 100)}%` }}></div>
-        </div>
-      )}
-      <main className={`lp-contenido ${indice % 2 === 1 ? 'lado-izquierdo' : ''}`} key={terminado ? 'fin' : indice}>
-        {contenido}
-      </main>
-    </div>
-     </RutinaContext.Provider>
+    <RutinaContext.Provider value={rutinaMascota}>
+      <div className="lp-pagina">
+        <Cabecera
+          titulo={`Lección ${leccion.id}: ${leccion.titulo}`}
+          onVolver={esRepaso && activa !== null ? () => setActiva(null) : volver}
+        />
+        {!enIntro && !terminado && (
+          <div className="lp-progreso">
+            <div className="lp-progreso-relleno" style={{ width: `${progreso}%` }}></div>
+          </div>
+        )}
+        <main
+          className={`lp-contenido ${indice % 2 === 1 ? 'lado-izquierdo' : ''} ${esRepaso ? 'en-repaso' : ''}`}
+          key={enIntro ? 'inicio' : terminado ? 'fin' : indice}
+        >
+          {contenido}
+        </main>
+      </div>
+    </RutinaContext.Provider>
   )
 }
 
@@ -1097,7 +1468,7 @@ function Leccion() {
         />
         <main className="lp-contenido">
           <div className="lp-fin">
-<Mascota estado="timida" mensaje="Esta lección estará lista muy pronto." tamano="grande" globo="arriba" />            <button className="lp-boton" onClick={() => navigate(`/categoria/${id}/lecciones`)}>
+            <Mascota estado="timida" mensaje="Esta lección estará lista muy pronto." tamano="grande" globo="arriba" />            <button className="lp-boton" onClick={() => navigate(`/categoria/${id}/lecciones`)}>
               Volver a las lecciones
             </button>
           </div>

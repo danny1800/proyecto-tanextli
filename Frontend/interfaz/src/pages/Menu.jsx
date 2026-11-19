@@ -7,12 +7,15 @@ import { cantidadCompletadas } from '../services/progreso'
 import { obtenerNombreSaludo } from '../services/preferencias'
 import '../styles/menu.css'
 
+// Orden en que aparecen las categorías
+const ORDEN = ['colores', 'numeros', 'familia', 'frases']
+
 function Menu({ usuario }) {
   // El apodo de Configuración, o su primer nombre
   const nombreUsuario = obtenerNombreSaludo(usuario)
 
   // Las tarjetas salen de data/categorias.js con el progreso real del usuario
-  const tarjetas = Object.entries(categorias).map(([id, cat]) => ({
+  const tarjetas = ORDEN.map((id) => [id, categorias[id]]).map(([id, cat]) => ({
     id,
     titulo: cat.titulo,
     descripcion: cat.descripcion,

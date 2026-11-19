@@ -21,7 +21,7 @@ const familiaLeccion3 = [
   { nahuatl: 'Nokonemaj', espanol: 'Sobrino', audio: '/audios/familia/mas-familiares/sobrino.m4a' },
   { nahuatl: 'Nokonemaj', espanol: 'Sobrina', audio: '/audios/familia/mas-familiares/sobrina.m4a' },
   { nahuatl: 'Monnantsin', espanol: 'Suegra', audio: '/audios/familia/mas-familiares/suegra.m4a' },
-  { nahuatl: 'Motatsin', espanol: 'Suegro', audio: '/audios/familia/mas-familiares/suegro.m4a' },
+  { nahuatl: 'Notatsin', espanol: 'Suegro', audio: '/audios/familia/mas-familiares/suegro.m4a' },
   { nahuatl: 'Noikniuj ni cihuat', espanol: 'Cuñada', audio: '/audios/familia/mas-familiares/cunada.m4a' },
   { nahuatl: 'Noikniuj ni tagat', espanol: 'Cuñado', audio: '/audios/familia/mas-familiares/cunado.m4a' },
 ]
@@ -112,7 +112,7 @@ export const contenidoLecciones = {
       actividades: ['escuchar', 'unir', 'opcion', 'escritura'],
       palabras: [
         { nahuatl: 'Xoxoktik', espanol: 'Verde', audio: '/audios/colores/verde.m4a', colorHex: '#43a047' },
-        { nahuatl: 'Chilkostik', espanol: 'Naranja', audio: '/audios/colores/naranja.m4a', colorHex: '#fb8c00' },
+        { nahuatl: 'Chilkostik', espanol: 'Anaranjado', audio: '/audios/colores/anaranjado.m4a', colorHex: '#fb8c00' },
         { nahuatl: 'Kaniojtik', espanol: 'Morado', audio: '/audios/colores/morado.m4a', colorHex: '#8e24aa' },
         { nahuatl: 'Xochipaltik', espanol: 'Rosa', audio: '/audios/colores/rosa.m4a', colorHex: '#f48fb1' },
         { nahuatl: 'Tenextik', espanol: 'Gris', audio: '/audios/colores/gris.m4a', colorHex: '#9e9e9e' },
@@ -223,3 +223,56 @@ contenidoLecciones.frases[5] = {
   palabras: frasesPorLeccion.flat(), // las 27 frases (sirven para las opciones de relleno)
   combinaciones: combinacionesFrases,
 }
+
+// ---------- Colores: audio solo en náhuatl y audio solo en español ----------
+// Así, al tocar una palabra no suena su respuesta.
+// "audio" pasa a ser solo el náhuatl; "audioEspanol" es la palabra en español;
+// "audioCompleto" guarda el audio de antes (español + náhuatl) por si se quiere usar.
+const sinAcentos = (t) => t.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+Object.values(contenidoLecciones.colores).forEach((leccion) => {
+  (leccion.palabras || []).forEach((p) => {
+    const archivo = sinAcentos(p.espanol)
+    p.audioCompleto = p.audio
+    p.audio = `/audios/colores/nahuatl/${archivo}_nah.m4a`
+    p.audioEspanol = `/audios/colores/espanol/${archivo}_es.m4a`
+  })
+})
+
+// ---------- Colores: repaso general (lección 3) ----------
+// Los 11 colores revueltos (primarios y secundarios)
+contenidoLecciones.colores[3] = {
+  actividades: ['miraColor', 'escuchaColor'],
+  palabras: [...contenidoLecciones.colores[1].palabras, ...contenidoLecciones.colores[2].palabras],
+}
+
+// ---------- Números: audios separados ----------
+// audioCompleto = el audio de siempre ("uno ... se"), solo para "Escucha y repite"
+// audio         = solo en náhuatl   (/audios/numeros/nahuatl/N_nah.m4a)
+// audioEspanol  = solo en español   (/audios/numeros/espanol/N_es.m4a)
+Object.values(contenidoLecciones.numeros).forEach((leccion) => {
+  leccion.palabras.forEach((p) => {
+    const m = p.audio && p.audio.match(/(\d+)\.m4a$/)
+    if (!m) return // ya está procesada (termina en _nah.m4a) o no tiene audio
+    p.audioCompleto = p.audio
+    p.audio = `/audios/numeros/nahuatl/${m[1]}_nah.m4a`
+    p.audioEspanol = `/audios/numeros/espanol/${m[1]}_es.m4a`
+  })
+})
+
+// ---------- Números: repaso general ----------
+// Act. 1: escribir del 1 al 10 | Act. 2: escuchar y elegir del 11 al 20 (revueltos en cada una)
+contenidoLecciones.numeros[5].actividades = ['escritura@1-10', 'opcion@11-20']
+
+// ---------- Familia: audios separados ----------
+// audioCompleto = el audio de siempre ("padre ... papan"), solo para "Escucha y repite"
+// audio         = solo en náhuatl   (<carpeta>/nahuatl/<nombre>_nah.m4a)
+// audioEspanol  = solo en español   (<carpeta>/espanol/<nombre>_es.m4a)
+Object.values(contenidoLecciones.familia).forEach((leccion) => {
+  leccion.palabras.forEach((p) => {
+    const m = p.audio && p.audio.match(/^(.*)\/([^/]+)\.m4a$/)
+    if (!m || m[2].endsWith('_nah')) return // sin audio o ya procesada
+    p.audioCompleto = p.audio
+    p.audio = `${m[1]}/nahuatl/${m[2]}_nah.m4a`
+    p.audioEspanol = `${m[1]}/espanol/${m[2]}_es.m4a`
+  })
+})
