@@ -86,10 +86,35 @@ export const INFO_ACTIVIDADES = {
     texto: 'Escucha la palabra en náhuatl y toca el color',
     icono: 'altavoz',
   },
-    armaNumero: {
+  armaNumero: {
     titulo: 'Arma el número',
     texto: 'Arma el número en náhuatl tocando sus piezas en orden',
     icono: 'lapiz',
+  },
+  leeNahuatl: {
+    titulo: 'Lee y elige',
+    texto: 'Lee la palabra en náhuatl y elige su significado en español',
+    icono: 'documento',
+  },
+  completaPalabra: {
+    titulo: 'Completa la palabra',
+    texto: 'Elige la parte que falta para completar la palabra en náhuatl',
+    icono: 'lapiz',
+  },
+    parejaFamilia: {
+    titulo: '¿Cuál es su pareja?',
+    texto: 'Elige la pareja de la palabra (abuelo → abuela)',
+    icono: 'documento',
+  },
+  dictadoFamilia: {
+    titulo: 'Escucha y arma',
+    texto: 'Escucha la palabra en náhuatl y arma con las fichas',
+    icono: 'altavoz',
+  },
+  verdaderoFalso: {
+    titulo: 'Verdadero o falso',
+    texto: 'Decide si la traducción es verdadera o falsa',
+    icono: 'documento',
   },
 }
 
@@ -115,6 +140,12 @@ export const ACTIVIDADES_POR_LECCION = {
   numeros: {
     3: ['escuchar', 'unirNumero', 'opcion', 'armaNumero'],
     4: ['escuchar', 'unirNumero', 'opcion', 'armaNumero'],
+  },
+  familia: {
+    1: ['escuchar', 'opcion', 'leeNahuatl', 'escritura'],
+    2: ['escuchar', 'escuchaElige', 'leeElige', 'unir'],
+    3: ['escuchar', 'unir', 'escuchaElige', 'completaPalabra'],
+    4: ['escuchar', 'opcion', 'unir', 'escritura'],
   },
 }
 

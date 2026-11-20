@@ -2,8 +2,8 @@ const familiaLeccion1 = [
   { nahuatl: 'Cenchan', espanol: 'Familia', audio: '/audios/familia/familia-principal/familia.m4a' },
   { nahuatl: 'Papan', espanol: 'Padre', audio: '/audios/familia/familia-principal/padre.m4a' },
   { nahuatl: 'Maman', espanol: 'Madre', audio: '/audios/familia/familia-principal/madre.m4a' },
-  { nahuatl: 'Noikniuj', espanol: 'Hermano', audio: '/audios/familia/familia-principal/hermano.m4a' },
-  { nahuatl: 'Noikniuj', espanol: 'Hermana', audio: '/audios/familia/familia-principal/hermana.m4a' },
+  { nahuatl: 'Noikniuj tagat', espanol: 'Hermano', audio: '/audios/familia/familia-principal/hermano.m4a' },
+  { nahuatl: 'Noikniuj cihuat', espanol: 'Hermana', audio: '/audios/familia/familia-principal/hermana.m4a' },
 ]
 
 const familiaLeccion2 = [
@@ -11,16 +11,16 @@ const familiaLeccion2 = [
   { nahuatl: 'Nanatsin', espanol: 'Abuela', audio: '/audios/familia/familia-extendida/abuela.m4a' },
   { nahuatl: 'Noikniuj papan', espanol: 'Tío', audio: '/audios/familia/familia-extendida/tio.m4a' },
   { nahuatl: 'Noikniuj maman', espanol: 'Tía', audio: '/audios/familia/familia-extendida/tia.m4a' },
-  { nahuatl: 'Nomajichniuj', espanol: 'Primo', audio: '/audios/familia/familia-extendida/primo.m4a' },
-  { nahuatl: 'Nomajichniuj', espanol: 'Prima', audio: '/audios/familia/familia-extendida/prima.m4a' },
+  { nahuatl: 'Nomajichniuj tagat', espanol: 'Primo', audio: '/audios/familia/familia-extendida/primo.m4a' },
+  { nahuatl: 'Nomajichniuj cihuat', espanol: 'Prima', audio: '/audios/familia/familia-extendida/prima.m4a' },
 ]
 
 const familiaLeccion3 = [
-  { nahuatl: 'Noixuiuj', espanol: 'Nieto', audio: '/audios/familia/mas-familiares/nieto.m4a' },
-  { nahuatl: 'Noiuiuj', espanol: 'Nieta', audio: '/audios/familia/mas-familiares/nieta.m4a' },
-  { nahuatl: 'Nokonemaj', espanol: 'Sobrino', audio: '/audios/familia/mas-familiares/sobrino.m4a' },
-  { nahuatl: 'Nokonemaj', espanol: 'Sobrina', audio: '/audios/familia/mas-familiares/sobrina.m4a' },
-  { nahuatl: 'Monnantsin', espanol: 'Suegra', audio: '/audios/familia/mas-familiares/suegra.m4a' },
+  { nahuatl: 'Noixuiuj okichpil', espanol: 'Nieto', audio: '/audios/familia/mas-familiares/nieto.m4a' },
+  { nahuatl: 'Noiuiuj suapil', espanol: 'Nieta', audio: '/audios/familia/mas-familiares/nieta.m4a' },
+  { nahuatl: 'Nokonemaj okichpil', espanol: 'Sobrino', audio: '/audios/familia/mas-familiares/sobrino.m4a' },
+  { nahuatl: 'Nokonemaj suapil', espanol: 'Sobrina', audio: '/audios/familia/mas-familiares/sobrina.m4a' },
+  { nahuatl: 'Nonantsin', espanol: 'Suegra', audio: '/audios/familia/mas-familiares/suegra.m4a' },
   { nahuatl: 'Notatsin', espanol: 'Suegro', audio: '/audios/familia/mas-familiares/suegro.m4a' },
   { nahuatl: 'Noikniuj ni cihuat', espanol: 'Cuñada', audio: '/audios/familia/mas-familiares/cunada.m4a' },
   { nahuatl: 'Noikniuj ni tagat', espanol: 'Cuñado', audio: '/audios/familia/mas-familiares/cunado.m4a' },
@@ -30,7 +30,7 @@ const familiaLeccion4 = [
   { nahuatl: 'Okichpil', espanol: 'Niño', audio: '/audios/familia/personas/nino.m4a' },
   { nahuatl: 'Suapil', espanol: 'Niña', audio: '/audios/familia/personas/nina.m4a' },
   { nahuatl: 'Tagat', espanol: 'Señor', audio: '/audios/familia/personas/senor.m4a' },
-  { nahuatl: 'Cihuatsin', espanol: 'Señora', audio: '/audios/familia/personas/senora.m4a' },
+  { nahuatl: 'Cihuat', espanol: 'Señora', audio: '/audios/familia/personas/senora.m4a' },
   { nahuatl: 'Wuehuet', espanol: 'Hombre', audio: '/audios/familia/personas/hombre.m4a' },
   { nahuatl: 'Lamat', espanol: 'Mujer', audio: '/audios/familia/personas/mujer.m4a' },
   { nahuatl: 'Pili', espanol: 'Bebé', audio: '/audios/familia/personas/bebe.m4a' },
@@ -274,5 +274,28 @@ Object.values(contenidoLecciones.familia).forEach((leccion) => {
     p.audioCompleto = p.audio
     p.audio = `${m[1]}/nahuatl/${m[2]}_nah.m4a`
     p.audioEspanol = `${m[1]}/espanol/${m[2]}_es.m4a`
+  })
+})
+
+// ---------- Familia: repaso general ----------
+// 3 actividades de 10 preguntas con las palabras de las 4 lecciones
+contenidoLecciones.familia[5] = {
+  actividades: ['parejaFamilia', 'dictadoFamilia', 'verdaderoFalso'],
+  palabras: [1, 2, 3, 4].flatMap((n) => contenidoLecciones.familia[n].palabras),
+}
+
+// ---------- Frases: audios separados ----------
+// audioCompleto = el audio de siempre (español + náhuatl), solo para "Escucha y repite"
+// audio         = solo en náhuatl   (<carpeta>/nahuatl/<nombre>_nah.m4a)
+// audioEspanol  = solo en español   (<carpeta>/espanol/<nombre>_es.m4a)
+// Ojo: en los nombres de archivo los guiones pasan a guion bajo (buenas-noches → buenas_noches)
+Object.values(contenidoLecciones.frases).forEach((leccion) => {
+  leccion.palabras.forEach((p) => {
+    const m = p.audio && p.audio.match(/^(.*)\/([^/]+)\.m4a$/)
+    if (!m || m[2].endsWith('_nah')) return // sin audio o ya procesada
+    const nombre = m[2].replace(/-/g, '_')
+    p.audioCompleto = p.audio
+    p.audio = `${m[1]}/nahuatl/${nombre}_nah.m4a`
+    p.audioEspanol = `${m[1]}/espanol/${nombre}_es.m4a`
   })
 })

@@ -9,6 +9,7 @@ import '../styles/leccion.css'
 import { actividadesDe } from '../data/actividades'
 import { armarPreguntasRepaso, preguntaEscuchaFrase } from '../data/repasoFrases'
 import { rutinas } from '../data/mascotaAnimaciones'
+import { armarPreguntasFamilia } from '../data/repasoFamilia'
 
 // NUEVO: la rutina de la mascota cambia según la categoría (familia, colores, numeros, frases)
 const RutinaContext = createContext('leccion')
@@ -209,16 +210,16 @@ function construirFases(palabrasLeccion, todasLasPalabras, actividades) {
       palabras.forEach((p) => fases.push({ tipo, palabra: { ...p, audio: p.audioCompleto || p.audio } }))
     } else if (tipo === 'unir' || tipo === 'unirNumero') {
       fases.push({ tipo, palabras, numero: numeroDe(tipo), de })
-    } else if (tipo === 'opcion' || tipo === 'escuchaElige' || tipo === 'leeElige') {
-      // Los botones llevan la palabra en español solo en "escuchaElige"
-      const campo = tipo === 'escuchaElige' ? 'espanol' : 'nahuatl'
+    } else if (tipo === 'opcion' || tipo === 'escuchaElige' || tipo === 'leeElige' || tipo === 'leeNahuatl') {
+      // Los botones llevan la palabra en español en "escuchaElige" y "leeNahuatl"
+      const campo = tipo === 'escuchaElige' || tipo === 'leeNahuatl' ? 'espanol' : 'nahuatl'
       palabras.forEach((p) => {
         const opciones = mezclar([p, ...elegirDistractores(p, palabras, todasLasPalabras, campo)])
         // En "opcion" suena la palabra en español (si existe) y se elige el náhuatl
         const palabraConAudio = tipo === 'opcion' ? { ...p, audio: p.audioEspanol || p.audio } : p
         fases.push({ tipo, palabra: palabraConAudio, opciones, numero: numeroDe(tipo), de })
       })
-    } else if (tipo === 'completa' || tipo === 'completaEs') {
+    } else if (tipo === 'completa' || tipo === 'completaEs' || tipo === 'completaPalabra') {
       // 'completa': frase en náhuatl (con la traducción arriba)
       // 'completaEs': escucha el náhuatl y completa la frase en español
       const campo = tipo === 'completaEs' ? 'espanol' : 'nahuatl'
@@ -229,7 +230,12 @@ function construirFases(palabrasLeccion, todasLasPalabras, actividades) {
           if (hueco.opciones.length >= 3) {
             fases.push({
               tipo: 'completa', // el reproductor usa el mismo paso para las dos
-              palabra: tipo === 'completaEs' ? { ...p, modoCompleta: 'espanol' } : p,
+              palabra:
+                tipo === 'completaEs'
+                  ? { ...p, modoCompleta: 'espanol' }
+                  : tipo === 'completaPalabra'
+                    ? { ...p, modoCompleta: 'palabra' }
+                    : p,
               ...hueco,
               numero: numeroDe(tipo),
               de,
@@ -254,6 +260,11 @@ function construirFases(palabrasLeccion, todasLasPalabras, actividades) {
       // Repaso general de Frases: las combinaciones salen de lecciones.js (campo "combinaciones")
       const combinaciones = Object.values(contenidoLecciones).flatMap((c) => Object.values(c)).flatMap((l) => l.combinaciones || [])
       armarPreguntasRepaso(tipo, combinaciones, palabras, usadosRepaso).forEach((q) =>
+        fases.push({ tipo: 'completa', ...q, numero: numeroDe(tipo), de }),
+      )
+    } else if (tipo === 'parejaFamilia' || tipo === 'dictadoFamilia' || tipo === 'verdaderoFalso') {
+      // Repaso general de Familia: 10 preguntas al azar por actividad
+      armarPreguntasFamilia(tipo, palabras).forEach((q) =>
         fases.push({ tipo: 'completa', ...q, numero: numeroDe(tipo), de }),
       )
     } else if (tipo === 'armaNumero') {
@@ -534,9 +545,9 @@ function ImagenNumero({ palabra }) {
 function PasoUnir({ modo = 'palabras', palabras, numero, de, onSiguiente }) {
   const [izquierda] = useState(() => mezclar(palabras))
   const [derecha] = useState(() => mezclar(palabras))
-  const [selIzq, setSelIzq] = useState(null) // elemento elegido a la izquierda (su náhuatl)
+  const [selIzq, setSelIzq] = useState(null) // id del elemento elegido a la izquierda
   const [selDer, setSelDer] = useState(null) // elemento elegido a la derecha
-  const [unidas, setUnidas] = useState([]) // palabras en náhuatl ya unidas
+  const [unidas, setUnidas] = useState([]) // parejas ya unidas: { izq, der }
   const [fallo, setFallo] = useState(null) // { izq, der } mientras parpadea en rojo
   const [huboError, setHuboError] = useState(false)
   const temporizador = useRef(null)
@@ -546,15 +557,20 @@ function PasoUnir({ modo = 'palabras', palabras, numero, de, onSiguiente }) {
   }, [])
 
   const esNumeros = modo === 'numeros'
+  // Cada botón de la izquierda tiene su propio id (primo y prima se escriben igual en náhuatl)
+  const idIzq = (p) => `${p.nahuatl}|${p.espanol}`
   // Qué valor identifica a cada elemento de la derecha
   const valorDerecha = (p) => (esNumeros ? p.nahuatl : p.espanol)
   const completo = unidas.length === palabras.length
-  const derechaUnidas = palabras.filter((p) => unidas.includes(p.nahuatl)).map(valorDerecha)
+  const izqUnidas = unidas.map((u) => u.izq)
+  const derUnidas = unidas.map((u) => u.der)
 
   function evaluar(izq, der) {
-    const palabra = palabras.find((p) => p.nahuatl === izq)
-    if (valorDerecha(palabra) === der) {
-      setUnidas((u) => [...u, izq])
+    const palabra = palabras.find((p) => idIzq(p) === izq)
+    // Si dos palabras se escriben igual en náhuatl, cualquiera de sus traducciones es válida
+    const acierta = palabras.some((q) => q.nahuatl === palabra.nahuatl && valorDerecha(q) === der)
+    if (acierta) {
+      setUnidas((u) => [...u, { izq, der }])
       setSelIzq(null)
       setSelDer(null)
     } else {
@@ -569,18 +585,18 @@ function PasoUnir({ modo = 'palabras', palabras, numero, de, onSiguiente }) {
   }
 
   function elegirIzquierda(p) {
-    if (fallo || unidas.includes(p.nahuatl)) return
+    if (fallo || izqUnidas.includes(idIzq(p))) return
     if (!esNumeros) sonar(p.audio)
     else sonar(p.audioEspanol) // el número suena en español ("dos")
-    const nuevo = selIzq === p.nahuatl ? null : p.nahuatl
+    const nuevo = selIzq === idIzq(p) ? null : idIzq(p)
     setSelIzq(nuevo)
     if (nuevo && selDer) evaluar(nuevo, selDer)
   }
 
   function elegirDerecha(p) {
-    if (fallo || derechaUnidas.includes(valorDerecha(p))) return
+    if (fallo || derUnidas.includes(valorDerecha(p))) return
     if (esNumeros) sonar(p.audio)
-    else if (p.audioEspanol) sonar(p.audioEspanol) // NUEVO: la palabra en español suena en español
+    else if (p.audioEspanol) sonar(p.audioEspanol) // la palabra en español suena en español
     const nuevo = selDer === valorDerecha(p) ? null : valorDerecha(p)
     setSelDer(nuevo)
     if (nuevo && selIzq) evaluar(selIzq, nuevo)
@@ -589,15 +605,15 @@ function PasoUnir({ modo = 'palabras', palabras, numero, de, onSiguiente }) {
   function claseIzquierda(p) {
     let clase = 'lp-par'
     if (esNumeros) clase += ' imagen'
-    if (unidas.includes(p.nahuatl)) clase += ' unida'
-    else if (fallo && fallo.izq === p.nahuatl) clase += ' fallo'
-    else if (selIzq === p.nahuatl) clase += ' seleccionada'
+    if (izqUnidas.includes(idIzq(p))) clase += ' unida'
+    else if (fallo && fallo.izq === idIzq(p)) clase += ' fallo'
+    else if (selIzq === idIzq(p)) clase += ' seleccionada'
     return clase
   }
 
   function claseDerecha(p) {
     let clase = 'lp-par'
-    if (derechaUnidas.includes(valorDerecha(p))) clase += ' unida'
+    if (derUnidas.includes(valorDerecha(p))) clase += ' unida'
     else if (fallo && fallo.der === valorDerecha(p)) clase += ' fallo'
     else if (selDer === valorDerecha(p)) clase += ' seleccionada'
     return clase
@@ -613,7 +629,7 @@ function PasoUnir({ modo = 'palabras', palabras, numero, de, onSiguiente }) {
       <div className="lp-pares">
         <div className="lp-columna">
           {izquierda.map((p) => (
-            <button key={p.nahuatl} className={claseIzquierda(p)} onClick={() => elegirIzquierda(p)}>
+            <button key={idIzq(p)} className={claseIzquierda(p)} onClick={() => elegirIzquierda(p)}>
               {esNumeros ? <ImagenNumero palabra={p} /> : p.nahuatl}
             </button>
           ))}
@@ -651,11 +667,12 @@ function PasoOpcionMultiple({ modo, palabra, opciones, numero, de, onSiguiente }
   const [fallos, setFallos] = useState(0)
 
   const idDe = (op) => `${op.nahuatl}|${op.espanol}`
-  const textoBoton = (op) => (modo === 'escuchaElige' ? op.espanol : op.nahuatl)
+  const textoBoton = (op) => (modo === 'escuchaElige' || modo === 'leeNahuatl' ? op.espanol : op.nahuatl)
   const pistas = {
     opcion: 'Escucha el audio y escoge la respuesta correcta',
     escuchaElige: 'Escucha la palabra y elige su significado en español',
     leeElige: 'Lee la palabra y elige cómo se dice en náhuatl',
+    leeNahuatl: 'Lee la palabra en náhuatl y elige su significado en español',
   }
 
   // Texto fijo que explica en qué consiste la actividad (se ve arriba del audio)
@@ -666,6 +683,7 @@ function PasoOpcionMultiple({ modo, palabra, opciones, numero, de, onSiguiente }
     escuchaElige: 'Escucha la palabra en náhuatl y elige su significado en español',
     leeElige: 'Lee la palabra en español y elige cómo se dice en náhuatl',
     numeroElige: 'Mira el número y elige cómo se dice en náhuatl',
+    leeNahuatl: 'Lee la palabra en náhuatl y elige su significado en español',
   }
 
   function comprobar() {
@@ -686,10 +704,10 @@ function PasoOpcionMultiple({ modo, palabra, opciones, numero, de, onSiguiente }
       {resultado === null && <MascotaPista pista={pistas[modo]} />}
       {resultado === null && <MascotaPista pista={pistas[modo]} />}
 
-      {modo === 'leeElige' ? (
+      {modo === 'leeElige' || modo === 'leeNahuatl' ? (
         <div className="lp-tarjeta">
           <p className="lp-traduccion">Lee la palabra</p>
-          <h2 className="lp-palabra">{palabra.espanol}</h2>
+          <h2 className="lp-palabra">{modo === 'leeNahuatl' ? palabra.nahuatl : palabra.espanol}</h2>
         </div>
       ) : (
         <>
@@ -762,7 +780,13 @@ function PasoCompletaHueco({ palabra, partes, hueco, opciones, numero, de, onSig
   return (
     <>
       <h2 className="lp-actividad">Actividad {numero} de {de}</h2>
-      <p className="lp-instruccion">{escucha ? 'Escucha y completa la frase en español' : 'Completa la frase'}</p>
+      <p className="lp-instruccion">
+        {escucha
+          ? 'Escucha y completa la frase en español'
+          : palabra.modoCompleta === 'palabra'
+            ? 'Completa la palabra en náhuatl'
+            : 'Completa la frase'}
+      </p>
       {resultado === null && (
         <MascotaPista pista={escucha ? 'Escucha la frase y elige la palabra que falta en español' : 'Elige la palabra que falta'} />
       )}
@@ -832,7 +856,8 @@ function PasoCompletaHueco({ palabra, partes, hueco, opciones, numero, de, onSig
 // modo 'escucha': suena la frase en náhuatl y se arma la traducción en español (fichas con palabras)
 // modo 'lee':     se lee la frase en español y se arma el náhuatl (fichas con frases)
 function PasoArmar({ palabra, opciones, numero, de, onSiguiente }) {
-  const escucha = palabra.modoArmar === 'escucha'
+  const esDictado = palabra.modoArmar === 'dictado'
+  const escucha = palabra.modoArmar === 'escucha' || esDictado
   const esNumero = palabra.modoArmar === 'numero'
   const [elegidas, setElegidas] = useState([]) // ids de las fichas, en el orden en que se tocaron
   const [resultado, setResultado] = useState(null) // null | correcto | incorrecto
@@ -894,10 +919,26 @@ function PasoArmar({ palabra, opciones, numero, de, onSiguiente }) {
     <>
       <h2 className="lp-actividad">Actividad {numero} de {de}</h2>
       <p className="lp-instruccion">
-        {escucha ? 'Escucha y selecciona las palabras' : esNumero ? 'Arma el número en náhuatl' : 'Lee y selecciona las frases en náhuatl'}
+        {esDictado
+          ? 'Escucha y arma la palabra en náhuatl'
+          : escucha
+            ? 'Escucha y selecciona las palabras'
+            : esNumero
+              ? 'Arma el número en náhuatl'
+              : 'Lee y selecciona las frases en náhuatl'}
       </p>
       {resultado === null && (
-        <MascotaPista pista={escucha ? 'Escucha y arma la frase en español' : esNumero ? 'Toca las piezas en orden para armar el número' : 'Arma la frase en náhuatl, en orden'} />
+        <MascotaPista
+          pista={
+            esDictado
+              ? 'Escucha con atención y arma la palabra con las fichas'
+              : escucha
+                ? 'Escucha y arma la frase en español'
+                : esNumero
+                  ? 'Toca las piezas en orden para armar el número'
+                  : 'Arma la frase en náhuatl, en orden'
+          }
+        />
       )}
 
       {escucha ? (
@@ -946,7 +987,9 @@ function PasoArmar({ palabra, opciones, numero, de, onSiguiente }) {
         ))}
       </div>
 
-      {resultado === 'correcto' && escucha && <p className="lp-ayuda">Se dice: {palabra.nahuatl}</p>}
+      {resultado === 'correcto' && escucha && (
+        <p className="lp-ayuda">{esDictado ? `Significa: ${palabra.espanol}` : `Se dice: ${palabra.nahuatl}`}</p>
+      )}
 
       {resultado === null ? (
         <button className="lp-boton" onClick={comprobar} disabled={elegidas.length === 0}>Comprobar</button>
@@ -963,8 +1006,139 @@ function PasoArmar({ palabra, opciones, numero, de, onSiguiente }) {
 
 // El reproductor sigue usando "PasoCompleta": este paso elige cuál de los dos se muestra
 function PasoCompleta(props) {
+  if (props.palabra.modoPareja) return <PasoPareja {...props} />
+  if (props.palabra.modoVF) return <PasoVerdaderoFalso {...props} />
   if (props.palabra.modoColor) return <PasoColor {...props} />
   return props.palabra.modoArmar ? <PasoArmar {...props} /> : <PasoCompletaHueco {...props} />
+}
+
+/* ---------- Pasos del repaso de Familia ---------- */
+
+// ¿Cuál es su pareja? (abuelo → abuela)
+function PasoPareja({ palabra, opciones, numero, de, onSiguiente }) {
+  const { reproducir, aviso } = useAudio(palabra.audio)
+  const [seleccion, setSeleccion] = useState(null) // texto en náhuatl de la opción elegida
+  const [resultado, setResultado] = useState(null) // null | correcto | incorrecto
+  const [fallos, setFallos] = useState(0)
+
+  function comprobar() {
+    const acierto = seleccion === palabra.pareja.nahuatl
+    if (!acierto) setFallos((f) => f + 1)
+    setResultado(acierto ? 'correcto' : 'incorrecto')
+  }
+
+  function reintentar() {
+    setSeleccion(null)
+    setResultado(null)
+  }
+
+  return (
+    <>
+      <h2 className="lp-actividad">Actividad {numero} de {de}</h2>
+      <p className="lp-instruccion">Elige la pareja de esta palabra en náhuatl</p>
+      {resultado === null && <MascotaPista pista="Piensa en su versión femenina o masculina" />}
+
+      <div className="lp-tarjeta">
+        <p className="lp-traduccion">¿Cuál es la pareja de…?</p>
+        <h2 className="lp-palabra">{palabra.nahuatl}</h2>
+        <p className="lp-traduccion">{palabra.espanol}</p>
+        <button className="lp-audio" onClick={reproducir} aria-label="Escuchar la palabra">
+          <IconAltavoz />
+        </button>
+        {aviso && <p className="lp-aviso">No se pudo reproducir el audio.</p>}
+      </div>
+
+      <div className="lp-opciones">
+        {opciones.map((op) => {
+          let clase = 'lp-opcion'
+          if (seleccion === op) {
+            clase += resultado ? (resultado === 'correcto' ? ' correcta' : ' incorrecta') : ' seleccionada'
+          }
+          return (
+            <button key={op} className={clase} disabled={resultado !== null} onClick={() => setSeleccion(op)}>
+              {op}
+            </button>
+          )
+        })}
+      </div>
+
+      {resultado === null ? (
+        <button className="lp-boton" onClick={comprobar} disabled={!seleccion}>Comprobar</button>
+      ) : (
+        <BarraResultado
+          resultado={resultado}
+          detalle={resultado === 'correcto' ? `${palabra.pareja.nahuatl} significa ${palabra.pareja.espanol}` : null}
+          textoBoton={resultado === 'correcto' ? 'Continuar' : 'Intentar de nuevo'}
+          onClick={resultado === 'correcto' ? () => onSiguiente(fallos === 0) : reintentar}
+        />
+      )}
+    </>
+  )
+}
+
+// Verdadero o falso: «Tatatsin» significa «Abuela»
+function PasoVerdaderoFalso({ palabra, numero, de, onSiguiente }) {
+  const { reproducir, aviso } = useAudio(palabra.audio)
+  const [seleccion, setSeleccion] = useState(null) // 'verdadero' | 'falso'
+  const [resultado, setResultado] = useState(null) // null | correcto | incorrecto
+  const [fallos, setFallos] = useState(0)
+
+  function comprobar() {
+    const acierto = (seleccion === 'verdadero') === palabra.esVerdad
+    if (!acierto) setFallos((f) => f + 1)
+    setResultado(acierto ? 'correcto' : 'incorrecto')
+  }
+
+  function reintentar() {
+    setSeleccion(null)
+    setResultado(null)
+  }
+
+  const claseDe = (valor) => {
+    let clase = 'lp-opcion'
+    if (seleccion === valor) {
+      clase += resultado ? (resultado === 'correcto' ? ' correcta' : ' incorrecta') : ' seleccionada'
+    }
+    return clase
+  }
+
+  return (
+    <>
+      <h2 className="lp-actividad">Actividad {numero} de {de}</h2>
+      <p className="lp-instruccion">¿Es verdadera esta afirmación?</p>
+      {resultado === null && <MascotaPista pista="Lee con atención: ¿esa es su traducción?" />}
+
+      <div className="lp-tarjeta">
+        <h2 className="lp-palabra">{palabra.nahuatl}</h2>
+        <p className="lp-traduccion">significa</p>
+        <h2 className="lp-palabra">{palabra.afirmacion}</h2>
+        <button className="lp-audio" onClick={reproducir} aria-label="Escuchar la palabra">
+          <IconAltavoz />
+        </button>
+        {aviso && <p className="lp-aviso">No se pudo reproducir el audio.</p>}
+      </div>
+
+      <div className="lp-opciones">
+        <button className={claseDe('verdadero')} disabled={resultado !== null} onClick={() => setSeleccion('verdadero')}>
+          Verdadero
+        </button>
+        <button className={claseDe('falso')} disabled={resultado !== null} onClick={() => setSeleccion('falso')}>
+          Falso
+        </button>
+      </div>
+
+      {resultado === null ? (
+        <button className="lp-boton" onClick={comprobar} disabled={!seleccion}>Comprobar</button>
+      ) : (
+        <BarraResultado
+          resultado={resultado}
+          detalle={resultado === 'correcto' && !palabra.esVerdad ? `${palabra.nahuatl} significa ${palabra.espanol}` : null}
+          textoBoton={resultado === 'correcto' ? 'Continuar' : 'Intentar de nuevo'}
+          onClick={resultado === 'correcto' ? () => onSiguiente(fallos === 0) : reintentar}
+        />
+      )}
+    </>
+  )
 }
 
 /* ---------- Paso: repaso de Colores ---------- */
@@ -1187,6 +1361,11 @@ const TITULOS_REPASO = {
   completaEs: 'Escucha y completa',
   escuchaFrase: 'Escucha y arma la frase',
   escritura: 'Escribe en náhuatl',
+  leeNahuatl: 'Lee y selecciona',
+  completaPalabra: 'Completa la palabra',
+  parejaFamilia: '¿Cuál es su pareja?',
+  dictadoFamilia: 'Escucha y arma',
+  verdaderoFalso: 'Verdadero o falso',
 }
 
 const plural = (n) => `${n} ${n === 1 ? 'pregunta' : 'preguntas'}`
@@ -1199,6 +1378,7 @@ const ICONO_REPASO = {
   miraColor: 'doc', leeArma: 'doc', leeElige: 'doc',
   escuchaColor: 'audio', escuchaArma: 'audio', escuchaFrase: 'audio', escuchaElige: 'audio', opcion: 'audio',
   completaDialogo: 'lapiz', completa: 'lapiz', completaEs: 'lapiz', escritura: 'lapiz',
+  parejaFamilia: 'doc', dictadoFamilia: 'audio', verdaderoFalso: 'lapiz',
 }
 
 function IconoRepaso({ tipo }) {
@@ -1393,7 +1573,7 @@ function ReproductorLeccion({ categoriaId, leccion, palabras, actividades, onRep
         onSiguiente={avanzar}
       />
     )
-  } else if (fase.tipo === 'opcion' || fase.tipo === 'escuchaElige' || fase.tipo === 'leeElige') {
+  } else if (fase.tipo === 'opcion' || fase.tipo === 'escuchaElige' || fase.tipo === 'leeElige' || fase.tipo === 'leeNahuatl') {
     contenido = (
       <PasoOpcionMultiple
         modo={fase.tipo}
