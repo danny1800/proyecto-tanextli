@@ -5,11 +5,15 @@ import Mascota from '../components/Mascota'
 import { categorias } from '../data/categorias'
 import { cantidadCompletadas } from '../services/progreso'
 import { obtenerNombreSaludo } from '../services/preferencias'
+import { useLobita } from '../services/useLobita' // NUEVO
 import '../styles/menu.css'
 
 function Menu({ usuario }) {
   // El apodo de Configuración, o su primer nombre
   const nombreUsuario = obtenerNombreSaludo(usuario)
+
+  // NUEVO: Lobita pregunta "¿Qué te gustaría aprender hoy?" y lo muestra en un globo
+  const textoLobita = useLobita('menu', { unaVez: true, esperar: true })
 
   // Las tarjetas salen de data/categorias.js con el progreso real del usuario
   const tarjetas = Object.entries(categorias).map(([id, cat]) => ({
@@ -38,7 +42,7 @@ function Menu({ usuario }) {
             <p>Tu esfuerzo hoy, te acerca a grandes logros. Sigue aprendiendo náhuatl.</p>
           </div>
           <div className="bienvenida-mascota">
-            <Mascota rutina="menu" tamano="pequeno" entrada="asomar" />
+            <Mascota rutina="menu" tamano="pequeno" entrada="asomar" mensaje={textoLobita} flotar />
           </div>
         </section>
 

@@ -498,7 +498,7 @@
 @media (max-width: 600px) {
   .lp-cabecera { padding: 12px 14px; }
   .lp-cabecera-titulo { font-size: 19px; }
- .lp-contenido { padding: 16px 16px 280px; }
+  .lp-contenido { padding: 16px 16px 280px; }
   .lp-barra { padding: 14px 16px; }
   .lp-barra-contenido { flex-direction: column; align-items: stretch; }
   .lp-boton-barra { width: 100%; }
@@ -520,7 +520,7 @@
     font-size: 14px;
   }
   .lp-mascota-zona .mascota-medio { width: 100px; }
-    /* En los pasos pares la mascota pasa al lado izquierdo */
+  /* En los pasos pares la mascota pasa al lado izquierdo */
   .lp-contenido.lado-izquierdo .lp-mascota-zona {
     right: auto;
     left: 24px;
@@ -554,6 +554,7 @@
   color: #1b4332;
 }
 .lp-respuesta strong { font-size: 18px; }
+
 /* ---------- Unir el número con su nombre ---------- */
 .lp-par.imagen {
   flex-direction: column;
@@ -665,7 +666,9 @@
 .lp-armado.incorrecta { border-color: #b3261e; background: #fdecec; }
 .lp-armado-vacio { color: #7f9d8b; font-size: 14px; font-weight: 600; }
 
-/* NUEVO: reserva el espacio de la barra de scroll para que la pantalla no se mueva de lado
+/* ---------- Mascota y estabilidad de la pantalla ---------- */
+
+/* Reserva el espacio de la barra de scroll para que la pantalla no se mueva de lado
    cuando aparece la barra de resultado */
 html:has(.lp-pagina) { scrollbar-gutter: stable; }
 
@@ -676,4 +679,13 @@ html:has(.lp-pagina) { scrollbar-gutter: stable; }
 }
 @media (max-width: 600px) {
   .lp-barra-info .mascota { margin: -60px 0 -6px; }
+}
+
+/* En pantallas angostas (o con las herramientas del navegador abiertas) la mascota se hace
+   más chica y deja de empujar el contenido hacia abajo */
+@media (max-width: 819px) {
+  .lp-mascota-zona {
+    zoom: 0.6;
+    margin-bottom: -40px;
+  }
 }
