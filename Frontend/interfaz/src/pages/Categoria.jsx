@@ -11,6 +11,7 @@ import {
 } from '../components/Icons'
 import '../styles/categoria.css'
 import { contenidoLecciones } from '../data/lecciones'
+import { useLobita } from '../services/useLobita' // NUEVO
 
 const iconosCategoria = {
   familia: IconFamilia,
@@ -38,6 +39,9 @@ function Categoria() {
   const { id } = useParams()
   const navigate = useNavigate()
   const categoria = categorias[id]
+
+  // NUEVO: Lobita habla cada vez que entras o regresas a la categoría (y lo muestra en el globo)
+  const textoLobita = useLobita('categoria', { clave: id })
 
   // Lecciones que lleva completadas el usuario (por ahora 0; luego vendrá del backend)
   const leccionesCompletadas = cantidadCompletadas(id)
@@ -77,6 +81,8 @@ function Categoria() {
                 rutina={rutinaMascota}
                 tamano="pequeno"
                 entrada={entradaPorCategoria[id] || 'deslizar'}
+                mensaje={textoLobita}
+                flotar
               />
             </div>
           </header>

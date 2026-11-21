@@ -1,5 +1,8 @@
 import { useParams, useNavigate, Link, Navigate } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
+import Mascota from '../components/Mascota' // NUEVO
+import { rutinas } from '../data/mascotaAnimaciones' // NUEVO
+import { useLobita } from '../services/useLobita' // NUEVO
 import { categorias } from '../data/categorias'
 import { actividadesDe, INFO_ACTIVIDADES } from '../data/actividades'
 import { IconAltavoz, IconMicrofono, IconDocumento, IconLapiz } from '../components/Icons'
@@ -12,10 +15,21 @@ const ICONOS = {
   lapiz: IconLapiz,
 }
 
+// NUEVO: cómo aparece la mascota en cada categoría
+const entradaPorCategoria = {
+  familia: 'deslizar',
+  colores: 'zoom',
+  numeros: 'asomar',
+  frases: 'aparecer',
+}
+
 function CategoriaIntro() {
   const { id } = useParams()
   const navigate = useNavigate()
   const categoria = categorias[id]
+
+  // NUEVO: Lobita habla cada vez que entras o regresas, y lo muestra en un globo
+  const textoLobita = useLobita('categoria', { clave: id })
 
   if (!categoria) {
     return <Navigate to="/menu" replace />
@@ -46,6 +60,18 @@ function CategoriaIntro() {
           ¿Qué hay en cada lección?
           <span className="intro-hojas">🍃🍃</span>
         </h1>
+
+        {/* NUEVO: mascota con la rutina de la categoría */}
+        <div className="intro-mascota">
+          <Mascota
+            key={id}
+            rutina={rutinas[id] ? id : 'categoria'}
+            tamano="pequeno"
+            entrada={entradaPorCategoria[id] || 'deslizar'}
+            mensaje={textoLobita}
+            flotar
+          />
+        </div>
 
         <div className="intro-grid">
           {tarjetas.map((t) => {

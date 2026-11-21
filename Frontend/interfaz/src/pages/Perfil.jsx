@@ -2,6 +2,8 @@ import { useNavigate } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import Mascota from '../components/Mascota'
 import { obtenerResumen, obtenerLogros, obtenerSiguienteLeccion } from '../services/estadisticas'
+import { useLobita } from '../services/useLobita' // NUEVO
+import { exclamar } from '../services/vozLobita' // NUEVO
 import '../styles/menu.css'
 import '../styles/perfil.css'
 
@@ -11,6 +13,14 @@ function mensajeDeLobita(porcentaje) {
   if (porcentaje < 50) return '¡Tú puedes! Aprendes rápidamente.'
   if (porcentaje < 100) return '¡Has progresado bastante! Falta menos.'
   return '¡Felicidades! Completaste todas las lecciones.'
+}
+
+// NUEVO: qué grupo de audios dice Lobita según el avance
+function grupoDeVoz(porcentaje) {
+  if (porcentaje === 0) return 'perfil0'
+  if (porcentaje < 50) return 'perfilPoco'
+  if (porcentaje < 100) return 'perfilMedio'
+  return 'perfilTodo'
 }
 
 // "EDGAR BAEZ SANTAMARIA" -> "Edgar Baez Santamaria"
@@ -29,6 +39,9 @@ function Perfil({ usuario }) {
   const logros = obtenerLogros(resumen)
   const siguiente = obtenerSiguienteLeccion()
   const logrosGanados = logros.filter((l) => l.logrado).length
+
+  // NUEVO: Lobita habla cada vez que entras al perfil y el globo muestra lo mismo que dice
+  const textoLobita = useLobita(grupoDeVoz(resumen.porcentaje), { ms: 6000 })
 
   const nombre = formatearNombre(usuario?.nombre_usuario)
   const inicial = nombre.charAt(0)
@@ -50,9 +63,9 @@ function Perfil({ usuario }) {
             <span className="pf-etiqueta">{rol}</span>
           </div>
           <div className="pf-mascota">
-            <p className="pf-globo">{mensajeDeLobita(resumen.porcentaje)}</p>
+            <p className="pf-globo">{textoLobita ? exclamar(textoLobita) : mensajeDeLobita(resumen.porcentaje)}</p>
             <div className="pf-mascota-imagen">
-             <Mascota rutina="perfil" tamano="pequeno" entrada="deslizar" />
+              <Mascota rutina="perfil" tamano="pequeno" entrada="deslizar" />
             </div>
           </div>
         </section>

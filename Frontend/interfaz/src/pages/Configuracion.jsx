@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react' // NUEVO: useEffect, useRef
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import Mascota from '../components/Mascota' // NUEVO
@@ -10,6 +10,8 @@ import {
 } from '../services/preferencias'
 import { reiniciarProgreso } from '../services/progreso'
 import { cerrarSesion } from '../services/authService'
+import { vozActiva, activarVoz, decirLobita } from '../services/vozLobita' // NUEVO
+import { useLobita } from '../services/useLobita' // NUEVO
 import '../styles/menu.css'
 import '../styles/perfil.css'
 
@@ -50,6 +52,10 @@ function Configuracion({ usuario }) {
   const [preferencias, setPreferencias] = useState(leerPreferencias)
   const [apodo, setApodo] = useState(preferencias.apodo)
   const [aviso, setAviso] = useState({ seccion: '', texto: '' })
+
+  // NUEVO: voz de Lobita (se puede apagar) y frase de ayuda al abrir la pantalla
+  const [voz, setVoz] = useState(vozActiva)
+  const textoAyuda = useLobita('ayuda', { unaVez: true })
 
   // NUEVO: reacción momentánea de la mascota (si es null, sigue su rutina)
   const [reaccion, setReaccion] = useState(null)
@@ -115,7 +121,7 @@ function Configuracion({ usuario }) {
             {reaccion ? (
               <Mascota estado={reaccion.estado} disparo={reaccion.n} tamano="pequeno" />
             ) : (
-              <Mascota rutina="configuracion" tamano="pequeno" entrada="deslizar" />
+              <Mascota rutina="configuracion" tamano="pequeno" entrada="deslizar" mensaje={textoAyuda} flotar />
             )}
           </div>
         </div>
@@ -150,6 +156,19 @@ function Configuracion({ usuario }) {
               descripcion="Agranda los textos y botones de toda la app."
               activo={preferencias.letraGrande}
               onCambiar={(v) => cambiar('letraGrande', v)}
+            />
+
+            {/* NUEVO: apagar o encender la voz de Lobita */}
+            <Interruptor
+              id="voz-lobita"
+              etiqueta="Voz de Lobita"
+              descripcion="Lobita habla al darte la bienvenida, al acertar y al equivocarte."
+              activo={voz}
+              onCambiar={(v) => {
+                setVoz(v)
+                activarVoz(v)
+                if (v) decirLobita('ayuda')
+              }}
             />
 
             {aviso.seccion === 'personalizacion' && (

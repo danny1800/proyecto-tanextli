@@ -20,18 +20,20 @@ import './styles/preferencias.css'
 aplicarPreferencias()
 
 function App() {
-  const [usuario, setUsuario] = useState(null)
+    //const [usuario, setUsuario] = useState(null)
+  // AHORA (TEMPORAL, solo para desarrollo)
+  const [usuario, setUsuario] = useState({ nombre_usuario: 'Edgar', correo: 'edgar@dev.com' })
   const [revisando, setRevisando] = useState(false)
   const navigate = useNavigate()
   const [, setBienvenidaVista] = useState(0)
 
   // Al abrir la app, revisa si ya había una sesión iniciada
-  useEffect(() => {
+  /*useEffect(() => {
     verificarSesion().then((u) => {
       setUsuario(u)
       setRevisando(false)
     })
-  }, [])
+  }, [])*/
 
   if (revisando) return <Cargando />
 

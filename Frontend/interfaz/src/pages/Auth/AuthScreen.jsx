@@ -14,9 +14,9 @@ export default function AuthScreen({ onLogin }) {
   const [mirada, setMirada] = useState(null);
   const { estado, mensaje: mensajeMascota, reaccionar } = useMascota();
 
-  // NUEVO: saluda al abrir la pantalla
+  // NUEVO: al abrir la pantalla la mascota saluda solo con un globo (sin voz)
   useEffect(() => {
-    reaccionar('saludando', '¡Hola! Vamos a aprender náhuatl', 3500);
+    reaccionar('saludando', '¡Hola! Inicia sesión para seguir aprendiendo náhuatl', 5000);
   }, []);
 
   const cambiar = (e) => setForm({ ...form, [e.target.name]: e.target.value });
@@ -58,14 +58,14 @@ export default function AuthScreen({ onLogin }) {
           texto: 'Correo o contraseña incorrectos. Si aún no tienes cuenta, crea una.',
           tipo: 'error',
         });
-        reaccionar('error', 'No encontré tu cuenta', 2500);
+        reaccionar('error', 'No encontré tu cuenta', 4000); // NUEVO
       } else {
         // Cualquier otro problema: muestra el error real del servidor
         setMensaje({
           texto: err.status ? `${err.message} (código ${err.status})` : err.message,
           tipo: 'error',
         });
-        reaccionar('error', 'Revisa tus datos', 2500);
+        reaccionar('error', 'Revisa tus datos', 4000); // NUEVO
       }
     } finally {
       setCargando(false);
