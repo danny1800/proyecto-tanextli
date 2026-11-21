@@ -15,8 +15,8 @@ function Menu({ usuario }) {
   // El apodo de Configuración, o su primer nombre
   const nombreUsuario = obtenerNombreSaludo(usuario)
 
-  // NUEVO: Lobita pregunta "¿Qué te gustaría aprender hoy?" y lo muestra en un globo
-  const textoLobita = useLobita('menu', { unaVez: true, esperar: true })
+  // NUEVO: Lobita habla al abrir el inicio y lo muestra en un globo (cada vez que entras)
+  const textoLobita = useLobita('menu', { ms: 7000 })
 
   // Las tarjetas salen de data/categorias.js con el progreso real del usuario
   const tarjetas = ORDEN.map((id) => [id, categorias[id]]).map(([id, cat]) => ({
@@ -45,7 +45,8 @@ function Menu({ usuario }) {
             <p>Tu esfuerzo hoy, te acerca a grandes logros. Sigue aprendiendo náhuatl.</p>
           </div>
           <div className="bienvenida-mascota">
-            <Mascota rutina="menu" tamano="pequeno" entrada="asomar" mensaje={textoLobita} flotar />
+            {/* NUEVO: el globo va a la izquierda para que no se salga de la pantalla */}
+            <Mascota rutina="menu" tamano="pequeno" entrada="asomar" mensaje={textoLobita} globo="izquierda" flotar />
           </div>
         </section>
 
