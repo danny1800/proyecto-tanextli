@@ -14,6 +14,10 @@ import { armarPreguntasFamilia } from '../data/repasoFamilia'
 // NUEVO: la rutina de la mascota cambia según la categoría (familia, colores, numeros, frases)
 const RutinaContext = createContext('leccion')
 
+// El repaso general muestra ayuda cuando se falla varias veces
+const RepasoContext = createContext(false)
+const AYUDA_REPASO_DESDE = 3 // intentos fallidos para que aparezca la ayuda
+
 // Títulos que aparecen en la barra de resultado (uno al azar)
 const TITULOS_ACIERTO = ['¡Excelente!', '¡Muy bien!', '¡Perfecto!', '¡Bien hecho!']
 const TITULOS_ERROR = [
@@ -259,7 +263,7 @@ function construirFases(palabrasLeccion, todasLasPalabras, actividades) {
     } else if (tipo === 'escuchaArma' || tipo === 'leeArma' || tipo === 'completaDialogo') {
       // Repaso general de Frases: las combinaciones salen de lecciones.js (campo "combinaciones")
       const combinaciones = Object.values(contenidoLecciones).flatMap((c) => Object.values(c)).flatMap((l) => l.combinaciones || [])
-      armarPreguntasRepaso(tipo, combinaciones, palabras, usadosRepaso).forEach((q) =>
+      armarPreguntasRepaso(tipo, combinaciones, palabras, usadosRepaso, 10).forEach((q) =>
         fases.push({ tipo: 'completa', ...q, numero: numeroDe(tipo), de }),
       )
     } else if (tipo === 'parejaFamilia' || tipo === 'dictadoFamilia' || tipo === 'verdaderoFalso') {
@@ -722,7 +726,15 @@ function PasoOpcionMultiple({ modo, palabra, opciones, numero, de, onSiguiente }
           )}
         </>
       )}
-
+      {resultado !== 'correcto' && (
+        <AyudaRepaso
+          fallos={fallos}
+          nahuatl={modo === 'opcion' || modo === 'escuchaElige' ? palabra.nahuatl : undefined}
+          espanol={modo === 'opcion' || modo === 'escuchaElige' ? palabra.espanol : undefined}
+          respuesta={textoBoton(palabra)}
+          onSaltar={() => onSiguiente(false)}
+        />
+      )}
       <div className="lp-opciones">
         {opciones.map((op) => {
           const id = idDe(op)
@@ -824,7 +836,13 @@ function PasoCompletaHueco({ palabra, partes, hueco, opciones, numero, de, onSig
           ))}
         </p>
       </div>
-
+      {resultado !== 'correcto' && (
+        <AyudaRepaso
+          fallos={fallos}
+          respuesta={partes.map((x) => x.antes + x.texto + x.despues).join(' ')}
+          onSaltar={() => onSiguiente(false)}
+        />
+      )}
       <div className="lp-fichas">
         {opciones.map((op) => (
           <button
@@ -964,7 +982,15 @@ function PasoArmar({ palabra, opciones, numero, de, onSiguiente }) {
           )}
         </div>
       )}
-
+      {resultado !== 'correcto' && (
+        <AyudaRepaso
+          fallos={fallos}
+          nahuatl={escucha ? palabra.nahuatl : undefined}
+          espanol={escucha ? palabra.espanol : undefined}
+          respuesta={palabra.solucion.join(' ')}
+          onSaltar={() => onSiguiente(false)}
+        />
+      )}
       <div className={`lp-armado ${resultado === 'correcto' ? 'correcta' : resultado === 'incorrecto' ? 'incorrecta' : ''}`}>
         {elegidas.length === 0 && <span className="lp-armado-vacio">Toca las fichas para armar la frase</span>}
         {elegidas.map((id) => (
@@ -1047,7 +1073,13 @@ function PasoPareja({ palabra, opciones, numero, de, onSiguiente }) {
         </button>
         {aviso && <p className="lp-aviso">No se pudo reproducir el audio.</p>}
       </div>
-
+      {resultado !== 'correcto' && (
+        <AyudaRepaso
+          fallos={fallos}
+          respuesta={palabra.pareja.nahuatl}
+          onSaltar={() => onSiguiente(false)}
+        />
+      )}
       <div className="lp-opciones">
         {opciones.map((op) => {
           let clase = 'lp-opcion'
@@ -1170,7 +1202,15 @@ function PasoColor({ palabra, opciones, numero, de, onSiguiente }) {
     }
     return clase
   }
-
+  const ayuda = resultado !== 'correcto' && (
+    <AyudaRepaso
+      fallos={fallos}
+      nahuatl={escucha ? palabra.nahuatl : undefined}
+      espanol={escucha ? palabra.espanol : undefined}
+      respuesta={`${palabra.nahuatl} (${palabra.espanol})`}
+      onSaltar={() => onSiguiente(false)}
+    />
+  )
   return (
     <>
       <h2 className="lp-actividad">Actividad {numero} de {de}</h2>
@@ -1303,7 +1343,13 @@ function PasoEscritura({ palabra, numero, de, onSiguiente }) {
           </div>
         )}
       </div>
-
+      {resultado !== 'correcto' && (
+        <AyudaRepaso
+          fallos={fallos}
+          respuesta={palabra.nahuatl}
+          onSaltar={() => onSiguiente(false)}
+        />
+      )}
       {resultado === null && <MascotaPista pista="¡Recuerda cómo lo aprendimos!" />}
 
       {resultado === null ? (
@@ -1398,6 +1444,88 @@ function IconoRepaso({ tipo }) {
   )
 }
 
+function AyudaRepaso({ fallos, nahuatl, espanol, respuesta, onSaltar }) {
+  const esRepaso = useContext(RepasoContext)
+  const [ver, setVer] = useState(null) // null | escribe | significa | respuesta
+
+  if (!esRepaso || fallos < AYUDA_REPASO_DESDE) return null
+
+  return (
+    <div className="lp-ayuda-repaso">
+      <p className="lp-ayuda-titulo">¿Necesitas ayuda?</p>
+      {ver === 'respuesta' ? (
+        <>
+          <p className="lp-respuesta">
+            La respuesta era: <strong>{respuesta}</strong>
+          </p>
+          <button className="lp-boton" onClick={onSaltar}>Continuar</button>
+        </>
+      ) : (
+        <>
+          {ver === 'escribe' && (
+            <p className="lp-respuesta">
+              Se escribe: <strong>{nahuatl}</strong>
+            </p>
+          )}
+          {ver === 'significa' && (
+            <p className="lp-respuesta">
+              Significa: <strong>{espanol}</strong>
+            </p>
+          )}
+          <div className="lp-ayuda-botones">
+            {nahuatl && <button className="lp-enlace" onClick={() => setVer('escribe')}>Ver cómo se escribe</button>}
+            {espanol && <button className="lp-enlace" onClick={() => setVer('significa')}>Ver qué significa</button>}
+            <button className="lp-enlace" onClick={() => setVer('respuesta')}>Saltar pregunta</button>
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
+function ResumenRepaso({ actividades, aciertos, porcentaje, onContinuar, onInicio, onProgreso, onRepasarLecciones }) {
+  const [oculta, setOculta] = useState(false)
+  return (
+    <div className="lp-repaso lp-repaso-final">
+      <Mascota estado="celebra" tamano="grande" entrada="zoom" />
+      <h2 className="lp-repaso-titulo">¡Felicidades!</h2>
+      <p className="lp-repaso-sub">Has completado el repaso general</p>
+
+      <div className="lp-repaso-desempeno">
+        <p className="lp-repaso-desempeno-titulo">Desempeño por actividad</p>
+        {actividades.map((a) => (
+          <div key={a.numero} className="lp-repaso-fila">
+            <div className="lp-repaso-fila-texto">
+              <span className="lp-repaso-fila-num">Actividad {a.numero}</span>
+              <strong className="lp-repaso-fila-nombre">{TITULOS_REPASO[a.tipo] || a.tipo}</strong>
+            </div>
+            <strong className="lp-repaso-fila-nota">{aciertos[a.numero] || 0}/{a.total}</strong>
+          </div>
+        ))}
+      </div>
+
+      {porcentaje < 70 && !oculta && (
+        <div className="lp-sugerencia">
+          <p className="lp-sugerencia-titulo">Sacaste {porcentaje}%</p>
+          <p className="lp-sugerencia-texto">
+            Te recomendamos repasar las lecciones de este tema para reforzar lo aprendido. Es opcional.
+          </p>
+          <div className="lp-sugerencia-botones">
+            <button className="lp-boton-secundario" onClick={onRepasarLecciones}>Repasar lecciones</button>
+            <button className="lp-enlace" onClick={() => setOculta(true)}>Ahora no</button>
+          </div>
+        </div>
+      )}
+
+      <div className="lp-repaso-botones">
+        <button className="lp-boton" onClick={onContinuar}>Continuar</button>
+        <button className="lp-boton-secundario" onClick={onInicio}>Volver al inicio</button>
+        <button className="lp-boton-secundario" onClick={onProgreso}>Ver mi progreso</button>
+      </div>
+    </div>
+  )
+}
+
 function IntroRepaso({ actividades, hechas, aciertos, onEmpezar }) {
   return (
     <div className="lp-repaso lp-repaso-intro">
@@ -1432,35 +1560,6 @@ function IntroRepaso({ actividades, hechas, aciertos, onEmpezar }) {
   )
 }
 
-function ResumenRepaso({ actividades, aciertos, onContinuar, onInicio, onProgreso }) {
-  return (
-    <div className="lp-repaso lp-repaso-final">
-      <Mascota estado="celebra" tamano="grande" entrada="zoom" />
-      <h2 className="lp-repaso-titulo">¡Felicidades!</h2>
-      <p className="lp-repaso-sub">Has completado el repaso general</p>
-
-      <div className="lp-repaso-desempeno">
-        <p className="lp-repaso-desempeno-titulo">Desempeño por actividad</p>
-        {actividades.map((a) => (
-          <div key={a.numero} className="lp-repaso-fila">
-            <div className="lp-repaso-fila-texto">
-              <span className="lp-repaso-fila-num">Actividad {a.numero}</span>
-              <strong className="lp-repaso-fila-nombre">{TITULOS_REPASO[a.tipo] || a.tipo}</strong>
-            </div>
-            <strong className="lp-repaso-fila-nota">{aciertos[a.numero] || 0}/{a.total}</strong>
-          </div>
-        ))}
-      </div>
-
-      <div className="lp-repaso-botones">
-        <button className="lp-boton" onClick={onContinuar}>Continuar</button>
-        <button className="lp-boton-secundario" onClick={onInicio}>Volver al inicio</button>
-        <button className="lp-boton-secundario" onClick={onProgreso}>Ver mi progreso</button>
-      </div>
-    </div>
-  )
-}
-
 /* ---------- Recorrido completo de una lección ---------- */
 
 function ReproductorLeccion({ categoriaId, leccion, palabras, actividades, onRepasar }) {
@@ -1486,6 +1585,9 @@ function ReproductorLeccion({ categoriaId, leccion, palabras, actividades, onRep
     .filter((a) => a !== 'escuchar')
     .map((entrada, i) => ({ tipo: entrada.split('@')[0], numero: i + 1, total: fases.filter((f) => f.numero === i + 1).length }))
 
+  const totalPreguntas = resumenActividades.reduce((s, a) => s + a.total, 0)
+  const totalAciertos = Object.values(aciertosPorActividad).reduce((s, n) => s + n, 0)
+  const porcentaje = totalPreguntas ? Math.round((totalAciertos / totalPreguntas) * 100) : 100
   const enIntro = esRepaso && activa === null && !terminado
 
   // Progreso: en el repaso se mide solo dentro de la actividad en curso
@@ -1550,6 +1652,8 @@ function ReproductorLeccion({ categoriaId, leccion, palabras, actividades, onRep
         onContinuar={volver}
         onInicio={() => navigate('/menu')}
         onProgreso={() => navigate('/perfil')}
+        porcentaje={porcentaje}
+        onRepasarLecciones={volver}
       />
     )
   } else if (terminado) {
@@ -1602,23 +1706,26 @@ function ReproductorLeccion({ categoriaId, leccion, palabras, actividades, onRep
 
   return (
     <RutinaContext.Provider value={rutinaMascota}>
-      <div className="lp-pagina">
-        <Cabecera
-          titulo={`Lección ${leccion.id}: ${leccion.titulo}`}
-          onVolver={esRepaso && activa !== null ? () => setActiva(null) : volver}
-        />
-        {!enIntro && !terminado && (
-          <div className="lp-progreso">
-            <div className="lp-progreso-relleno" style={{ width: `${progreso}%` }}></div>
-          </div>
-        )}
-        <main
-          className={`lp-contenido ${indice % 2 === 1 ? 'lado-izquierdo' : ''} ${esRepaso ? 'en-repaso' : ''}`}
-          key={enIntro ? 'inicio' : terminado ? 'fin' : indice}
-        >
-          {contenido}
-        </main>
-      </div>
+      <RepasoContext.Provider value={esRepaso}>
+        <div className="lp-pagina">
+
+          <Cabecera
+            titulo={`Lección ${leccion.id}: ${leccion.titulo}`}
+            onVolver={esRepaso && activa !== null ? () => setActiva(null) : volver}
+          />
+          {!enIntro && !terminado && (
+            <div className="lp-progreso">
+              <div className="lp-progreso-relleno" style={{ width: `${progreso}%` }}></div>
+            </div>
+          )}
+          <main
+            className={`lp-contenido ${indice % 2 === 1 ? 'lado-izquierdo' : ''} ${esRepaso ? 'en-repaso' : ''}`}
+            key={enIntro ? 'inicio' : terminado ? 'fin' : indice}
+          >
+            {contenido}
+          </main>
+        </div>
+      </RepasoContext.Provider>
     </RutinaContext.Provider>
   )
 }

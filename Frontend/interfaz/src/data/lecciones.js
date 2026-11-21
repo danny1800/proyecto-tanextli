@@ -293,7 +293,7 @@ Object.values(contenidoLecciones.frases).forEach((leccion) => {
   leccion.palabras.forEach((p) => {
     const m = p.audio && p.audio.match(/^(.*)\/([^/]+)\.m4a$/)
     if (!m || m[2].endsWith('_nah')) return // sin audio o ya procesada
-    const nombre = m[2].replace(/-/g, '_')
+    const nombre = m[2].replace(/-/g, ' ')
     p.audioCompleto = p.audio
     p.audio = `${m[1]}/nahuatl/${nombre}_nah.m4a`
     p.audioEspanol = `${m[1]}/espanol/${nombre}_es.m4a`

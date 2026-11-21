@@ -175,7 +175,7 @@ function elegirCombinaciones(pool, cantidad, usados) {
     }
   }
 
-  const deDos = Math.min(2, cantidad)
+  const deDos = Math.min(Math.round(cantidad * 0.4), cantidad)
   tomar(dos, deDos)
   tomar(tres, cantidad - elegidas.length)
   if (elegidas.length < cantidad) tomar([...dos, ...tres].filter((c) => !elegidas.includes(c)), cantidad - elegidas.length)
