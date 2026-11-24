@@ -19,21 +19,26 @@ import './styles/preferencias.css'
 // Aplica la letra grande / animaciones guardadas desde que abre la app
 aplicarPreferencias()
 
+// SOLO PARA DESARROLLO: si lo pones en true, la app entra directo con un usuario de prueba
+// y NO pide login (y "Cerrar sesión" no te llevará al login).
+// Déjalo en false para que la app funcione normal, y NO lo subas en true al repositorio.
+const SALTAR_LOGIN = false
+const USUARIO_DE_PRUEBA = { nombre_usuario: 'Edgar', correo: 'edgar@dev.com' }
+
 function App() {
-    //const [usuario, setUsuario] = useState(null)
-  // AHORA (TEMPORAL, solo para desarrollo)
-  const [usuario, setUsuario] = useState({ nombre_usuario: 'Edgar', correo: 'edgar@dev.com' })
-  const [revisando, setRevisando] = useState(false)
+  const [usuario, setUsuario] = useState(SALTAR_LOGIN ? USUARIO_DE_PRUEBA : null)
+  const [revisando, setRevisando] = useState(!SALTAR_LOGIN)
   const navigate = useNavigate()
   const [, setBienvenidaVista] = useState(0)
 
   // Al abrir la app, revisa si ya había una sesión iniciada
-  /*useEffect(() => {
+  useEffect(() => {
+    if (SALTAR_LOGIN) return
     verificarSesion().then((u) => {
       setUsuario(u)
       setRevisando(false)
     })
-  }, [])*/
+  }, [])
 
   if (revisando) return <Cargando />
 

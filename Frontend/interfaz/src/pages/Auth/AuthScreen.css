@@ -3,7 +3,9 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh; /* la altura exacta de la ventana: así no hay barra de desplazamiento */
+  overflow: hidden;
   background-color: #f4f6f8;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   padding: 20px;
@@ -14,11 +16,16 @@
   display: flex;
   width: 100%;
   max-width: 900px;
-  min-height: 580px;
   background-color: #fff;
   border-radius: 20px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
   overflow: hidden;
+
+  /* NUEVO: la tarjeta se achica sola si la ventana es baja, para que todo quepa sin scroll.
+     780px es la altura aproximada de la tarjeta completa (con el formulario de registro).
+     Si aun así se corta, sube ese número; si sobra espacio, bájalo. */
+  zoom: 0.85; /* respaldo para navegadores viejos */
+  zoom: clamp(0.4, calc(tan(atan2(100dvh - 40px, 780px))), 1);
 }
 
 /* ---- Lado izquierdo ---- */
@@ -63,6 +70,7 @@
   font-size: 16px;
   font-weight: 600;
   line-height: 1.4;
+  margin: 0 0 8px;
   z-index: 1;
 }
 
@@ -79,6 +87,14 @@
   box-sizing: border-box;
 }
 .auth__mascota img { width: 100%; height: 100%; object-fit: contain; }
+
+/* NUEVO: lugar de la mascota animada (un poco más chica para que la tarjeta no crezca de más) */
+.auth__mascota-animada {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+  zoom: 0.75;
+}
 
 /* ---- Lado derecho ---- */
 .auth__right {
@@ -168,26 +184,6 @@
 .auth__message--success { background: #e6f4ea; color: #137333; border-color: #a8dab5; }
 .auth__message--error   { background: #fce8e6; color: #c5221f; border-color: #f5c2c0; }
 
-/* ---- Celular: se apilan los paneles ---- */
-@media (max-width: 720px) {
-  .auth__card { flex-direction: column; min-height: auto; }
-  .auth__left { padding: 30px 20px; }
-  .auth__left-title { font-size: 36px; }
-  .auth__mascota { width: 120px; height: 120px; }
-  .auth__right { padding: 30px 24px; }
-
-  .auth__mascota-animada {
-  display: flex;
-  justify-content: center;
-  margin-top: 16px;
-
-  /* NUEVO: lugar de la mascota animada */
-.auth__mascota-animada {
-  display: flex;
-  justify-content: center;
-  margin-top: 16px;
-}
-}
 .auth__help {
   margin: 0 0 14px;
   font-size: 14px;
@@ -195,4 +191,18 @@
   text-align: center;
   line-height: 1.4;
 }
+
+/* ---- Celular: se apilan los paneles (aquí sí puede haber scroll, no cabe todo en una pantalla) ---- */
+@media (max-width: 720px) {
+  .auth {
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+  .auth__card { flex-direction: column; zoom: 1; }
+  .auth__left { padding: 30px 20px; }
+  .auth__left-title { font-size: 36px; }
+  .auth__mascota { width: 120px; height: 120px; }
+  .auth__mascota-animada { margin-top: 16px; zoom: 1; }
+  .auth__right { padding: 30px 24px; }
 }
